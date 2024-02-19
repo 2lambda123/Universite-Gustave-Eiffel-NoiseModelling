@@ -16,7 +16,6 @@
  * @Author Pierre Aumond, Université Gustave Eiffel
  * @Author buildingParams.json is from https://github.com/orbisgis/geoclimate/
  */
-
 package org.noise_planet.noisemodelling.wps.Import_and_Export
 
 import crosby.binary.osmosis.OsmosisReader
@@ -41,6 +40,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.sql.Connection
+import java.security.SecureRandom
 
 title = 'Import BUILDINGS, GROUND and ROADS tables from OSM'
 
@@ -59,7 +59,7 @@ inputs = [
                 title      : 'Path of the OSM file',
                 description: '&#128194; Path of the OSM file, including its extension (.osm, .osm.gz or .osm.pbf).<br>' +
                              'For example: c:/home/area.osm.pbf',
-                type       : String.class
+                type       : String
         ],
         targetSRID : [
                 name       : 'Target projection identifier',
@@ -67,7 +67,7 @@ inputs = [
                 description: '&#127757; Target projection identifier (also called SRID) of your table.<br>' +
                              'It should be an <a href="https://epsg.io/" target="_blank">EPSG</a> code, an integer with 4 or 5 digits (ex: <a href="https://epsg.io/3857" target="_blank">3857</a> is Web Mercator projection).<br><br>' +
                              '&#x1F6A8; The target SRID must be in <b>metric</b> coordinates.',
-                type       : Integer.class
+                type       : Integer
         ],
         ignoreBuilding : [
                 name       : 'Do not import Buildings',
@@ -79,23 +79,23 @@ inputs = [
                              '- <b> HEIGHT </b> : The height of the building (FLOAT). ' +
                              'If this information is not available then it is deduced from the number of floors (if available) with the addition of a small random variation from one building to another. ' +
                              'Finally, if no information is available, a height of 5m is set by default.',
-                min        : 0, 
+                min        : 0,
                 max        : 1,
-                type       : Boolean.class
+                type       : Boolean
         ],
         ignoreGround : [
                 name       : 'Do not import Surface acoustic absorption',
                 title      : 'Do not import Surface acoustic absorption',
                 description: '&#9989; If the box is checked &#8594; the table GROUND will <b>NOT</b> be created.<br><br>' +
                              '&#129001; If the box is <b>NOT</b> checked &#8594; the table GROUND will be created and will contain: <br>' +
-                             '- <b> PK </b> : An identifier. It shall be a primary key (INTEGER, PRIMARY KEY)<br>' + 
-                             '- <b> ID_WAY </b> : OSM identifier (INTEGER)<br>' + 
+                             '- <b> PK </b> : An identifier. It shall be a primary key (INTEGER, PRIMARY KEY)<br>' +
+                             '- <b> ID_WAY </b> : OSM identifier (INTEGER)<br>' +
                              '- <b> THE_GEOM </b> : The 2D geometry of the sources (POLYGON or MULTIPOLYGON)<br>' +
                              '- <b> PRIORITY </b> : Since NoiseModelling does not allowed overlapping geometries, if this is the case, this column is used to prioritize the geometry that will win over the other one when cutting. The order is given according to the type of land use<br>' +
                              '- <b> G </b> : The acoustic absorption of a ground (FLOAT) (between 0 : very hard and 1 : very soft)',
-                min        : 0, 
+                min        : 0,
                 max        : 1,
-                type       : Boolean.class
+                type       : Boolean
         ],
         ignoreRoads : [
                 name       : 'Do not import Roads',
@@ -104,7 +104,7 @@ inputs = [
                              '&#129001; If the box is <b>NOT</b> checked &#8594; the table ROADS will be created and will contain:<br>' +
                              '- <b> PK </b> : An identifier. It shall be a primary key (INTEGER, PRIMARY KEY)<br>' +
                              '- <b> ID_WAY </b> : OSM identifier (INTEGER)<br>' +
-                             '- <b> THE_GEOM </b> : The 2D geometry of the sources (LINESTRING or MULTILINESTRING)<br>' +                        
+                             '- <b> THE_GEOM </b> : The 2D geometry of the sources (LINESTRING or MULTILINESTRING)<br>' +
                              '- <b> LV_D </b> : Hourly average light and heavy vehicle count (6-18h) (DOUBLE)<br>' +
                              '- <b> LV_E </b> : Hourly average light and heavy vehicle count (18-22h) (DOUBLE)<br>' +
                              '- <b> LV_N </b> : Hourly average light and heavy vehicle count (22-6h) (DOUBLE)<br>' +
@@ -119,17 +119,17 @@ inputs = [
                              '- <b> HGV_SPD_N </b> : Hourly average heavy vehicle speed (22-6h) (DOUBLE)<br>' +
                              '- <b> PVMT </b> : CNOSSOS road pavement identifier (ex: NL05) (VARCHAR)<br> <br>' +
                              '&#128161; <b>These information are deduced from the roads importance in OSM.</b>.',
-                min        : 0, 
+                min        : 0,
                 max        : 1,
-                type       : Boolean.class
+                type       : Boolean
         ],
         removeTunnels : [
                 name       : 'Remove tunnels from OSM data',
                 title      : 'Remove tunnels from OSM data',
                 description: '&#9989; If checked, remove roads from OSM data that contain OSM tag <b>tunnel=yes</b>.',
-                min        : 0, 
+                min        : 0,
                 max        : 1,
-                type       : Boolean.class
+                type       : Boolean
         ],
 ]
 
@@ -138,7 +138,7 @@ outputs = [
                 name: 'Result output string',
                 title: 'Result output string',
                 description: 'This type of result does not allow the blocks to be linked together.',
-                type: String.class
+                type: String
         ]
 ]
 
@@ -158,7 +158,7 @@ def run(input) {
     // Get name of the database
     // by default an embedded h2gis database is created
     // Advanced user can replace this database for a postGis or h2Gis server database.
-    String dbName = "h2gisdb"
+    String dbName = 'h2gisdb'
 
     // Open connection
     openGeoserverDataStoreConnection(dbName).withCloseable {
@@ -170,7 +170,6 @@ def run(input) {
 // main function of the script
 def exec(Connection connection, input) {
 
-
     //Map buildingsParamsMap = buildingsParams.toMap();
     connection = new ConnectionWrapper(connection)
 
@@ -178,15 +177,15 @@ def exec(Connection connection, input) {
 
     String resultString
 
-    Logger logger = LoggerFactory.getLogger("org.noise_planet.noisemodelling")
+    Logger logger = LoggerFactory.getLogger('org.noise_planet.noisemodelling')
     logger.info('Start : Get Buildings from OSM')
-    logger.info("inputs {}", input)
+    logger.info('inputs {}', input)
 
     // -------------------
     // Get every inputs
     // -------------------
 
-    String pathFile = input["pathFile"] as String
+    String pathFile = input['pathFile'] as String
 
     Boolean ignoreBuilding = false
     if ('ignoreBuilding' in input) {
@@ -215,35 +214,35 @@ def exec(Connection connection, input) {
 
     // Read the OSM file, depending on its extension
     def reader
-    if (pathFile.toLowerCase(Locale.getDefault()).endsWith(".pbf")) {
-        InputStream inputStream = new FileInputStream(pathFile);
-        reader = new OsmosisReader(inputStream);
-    } else if (pathFile.toLowerCase(Locale.getDefault()).endsWith(".osm")) {
-        reader = new XmlReader(new File(pathFile), true, CompressionMethod.None);
-    } else if (pathFile.toLowerCase(Locale.getDefault()).endsWith(".osm.gz")) {
-        reader = new XmlReader(new File(pathFile), true, CompressionMethod.GZip);
+    if (pathFile.toLowerCase(Locale.getDefault()).endsWith('.pbf')) {
+        InputStream inputStream = new FileInputStream(pathFile)
+        reader = new OsmosisReader(inputStream)
+    } else if (pathFile.toLowerCase(Locale.getDefault()).endsWith('.osm')) {
+        reader = new XmlReader(new File(pathFile), true, CompressionMethod.None)
+    } else if (pathFile.toLowerCase(Locale.getDefault()).endsWith('.osm.gz')) {
+        reader = new XmlReader(new File(pathFile), true, CompressionMethod.GZip)
     } else {
-        throw new IllegalArgumentException("File extension not known.Should be pbf, osm or osm.gz but got " + pathFile)
+        throw new IllegalArgumentException('File extension not known.Should be pbf, osm or osm.gz but got ' + pathFile)
     }
 
     OsmHandler handler = new OsmHandler(logger, ignoreBuilding, ignoreRoads, ignoreGround, removeTunnels)
-    reader.setSink(handler);
-    reader.run();
+    reader.setSink(handler)
+    reader.run()
 
     logger.info('OSM Read done')
 
     if (!ignoreBuilding) {
-        String tableName = "MAP_BUILDINGS_GEOM";
+        String tableName = 'MAP_BUILDINGS_GEOM'
 
-        sql.execute("DROP TABLE IF EXISTS " + tableName)
-        sql.execute("CREATE TABLE " + tableName + '''( 
-            ID_WAY integer PRIMARY KEY, 
+        sql.execute('DROP TABLE IF EXISTS ' + tableName)
+        sql.execute('CREATE TABLE ' + tableName + '''(
+            ID_WAY integer PRIMARY KEY,
             THE_GEOM geometry,
             HEIGHT real
         );''')
 
         for (Building building: handler.buildings) {
-            sql.execute("INSERT INTO " + tableName + " VALUES (" + building.id + ", ST_MakeValid(ST_SIMPLIFYPRESERVETOPOLOGY(ST_Transform(ST_GeomFromText('" + building.geom + "', 4326), "+srid+"),0.1)), " + building.height + ")")
+            sql.execute('INSERT INTO ' + tableName + ' VALUES (' + building.id + ", ST_MakeValid(ST_SIMPLIFYPRESERVETOPOLOGY(ST_Transform(ST_GeomFromText('" + building.geom + "', 4326), " + srid + '),0.1)), ' + building.height + ')')
         }
 
         sql.execute('''
@@ -251,31 +250,31 @@ def exec(Connection connection, input) {
             -- List buildings that intersects with other buildings that have a greater area
             DROP TABLE IF EXISTS tmp_relation_buildings_buildings;
             CREATE TABLE tmp_relation_buildings_buildings AS SELECT s1.ID_WAY as PK_BUILDING, S2.ID_WAY as PK2_BUILDING FROM MAP_BUILDINGS_GEOM S1, MAP_BUILDINGS_GEOM S2 WHERE ST_AREA(S1.THE_GEOM) < ST_AREA(S2.THE_GEOM) AND S1.THE_GEOM && S2.THE_GEOM AND ST_DISTANCE(S1.THE_GEOM, S2.THE_GEOM) <= 0.1;
-            
+
             -- Alter that small area buildings by removing shared area
             DROP TABLE IF EXISTS tmp_buildings_truncated;
             CREATE TABLE tmp_buildings_truncated AS SELECT PK_BUILDING, ST_DIFFERENCE(s1.the_geom, ST_BUFFER(ST_Collect(s2.the_geom), 0.1, 'join=mitre')) the_geom, s1.HEIGHT HEIGHT from tmp_relation_buildings_buildings r, MAP_BUILDINGS_GEOM s1, MAP_BUILDINGS_GEOM s2 WHERE PK_BUILDING = S1.ID_WAY AND PK2_BUILDING = S2.ID_WAY  GROUP BY PK_BUILDING;
-            
-            -- Merge original buildings with altered buildings 
+
+            -- Merge original buildings with altered buildings
             DROP TABLE IF EXISTS BUILDINGS;
             CREATE TABLE BUILDINGS(PK INTEGER PRIMARY KEY, THE_GEOM GEOMETRY, HEIGHT real) AS SELECT s.id_way, ST_SETSRID(s.the_geom, '''+srid+'''), s.HEIGHT from  MAP_BUILDINGS_GEOM s where id_way not in (select PK_BUILDING from tmp_buildings_truncated) UNION ALL select PK_BUILDING, ST_SETSRID(the_geom, '''+srid+'''), HEIGHT from tmp_buildings_truncated WHERE NOT st_isempty(the_geom);
-    
+
             DROP TABLE IF EXISTS tmp_buildings_truncated;
             DROP TABLE IF EXISTS tmp_relation_buildings_buildings;
             DROP TABLE IF EXISTS MAP_BUILDINGS_GEOM;
-        ''');
+        ''')
 
-        sql.execute("CREATE SPATIAL INDEX IF NOT EXISTS BUILDING_GEOM_INDEX ON " + "BUILDINGS" + "(THE_GEOM)")
+        sql.execute('CREATE SPATIAL INDEX IF NOT EXISTS BUILDING_GEOM_INDEX ON ' + 'BUILDINGS' + '(THE_GEOM)')
 
     }
 
     if (!ignoreRoads) {
-        sql.execute("DROP TABLE IF EXISTS ROADS")
-        sql.execute("CREATE TABLE ROADS (PK serial PRIMARY KEY, ID_WAY integer, THE_GEOM geometry, TYPE varchar, LV_D integer, LV_E integer,LV_N integer,HGV_D integer,HGV_E integer,HGV_N integer,LV_SPD_D integer,LV_SPD_E integer,LV_SPD_N integer,HGV_SPD_D integer, HGV_SPD_E integer,HGV_SPD_N integer, PVMT varchar(10));")
+        sql.execute('DROP TABLE IF EXISTS ROADS')
+        sql.execute('CREATE TABLE ROADS (PK serial PRIMARY KEY, ID_WAY integer, THE_GEOM geometry, TYPE varchar, LV_D integer, LV_E integer,LV_N integer,HGV_D integer,HGV_E integer,HGV_N integer,LV_SPD_D integer,LV_SPD_E integer,LV_SPD_N integer,HGV_SPD_D integer, HGV_SPD_E integer,HGV_SPD_N integer, PVMT varchar(10));')
 
         for (Road road: handler.roads) {
             if (road.geom.isEmpty()) {
-                continue;
+                continue
             }
             String query = 'INSERT INTO ROADS(ID_WAY, ' +
                     'THE_GEOM, ' +
@@ -289,18 +288,18 @@ def exec(Connection connection, input) {
                     'st_setsrid(st_updatez(ST_precisionreducer(ST_SIMPLIFYPRESERVETOPOLOGY(ST_TRANSFORM(ST_GeomFromText(?, 4326), '+srid+'),0.1),1), 0.05), ' + srid + '),' +
                     '?,?,?,?,?,?,?,?,?,?,?,?,?,?);'
             sql.execute(query, [road.id, road.geom, road.type,
-                                road.getNbLV("d"), road.getNbLV("e"), road.getNbLV("n"),
-                                road.getNbHV("d"), road.getNbHV("e"), road.getNbHV("n"),
+                                road.getNbLV('d'), road.getNbLV('e'), road.getNbLV('n'),
+                                road.getNbHV('d'), road.getNbHV('e'), road.getNbHV('n'),
                                 Road.speed[road.category], Road.speed[road.category], Road.speed[road.category],
                                 Math.min(90, Road.speed[road.category]), Math.min(90, Road.speed[road.category]), Math.min(90, Road.speed[road.category]),
                                 'NL08'])
         }
-        sql.execute("CREATE SPATIAL INDEX IF NOT EXISTS ROADS_GEOM_INDEX ON " + "ROADS" + "(THE_GEOM)")
+        sql.execute('CREATE SPATIAL INDEX IF NOT EXISTS ROADS_GEOM_INDEX ON ' + 'ROADS' + '(THE_GEOM)')
     }
 
     if (!ignoreGround) {
-        sql.execute("DROP TABLE IF EXISTS GROUND")
-        sql.execute("CREATE TABLE GROUND (PK serial PRIMARY KEY, ID_WAY int, THE_GEOM geometry, PRIORITY int, G double);")
+        sql.execute('DROP TABLE IF EXISTS GROUND')
+        sql.execute('CREATE TABLE GROUND (PK serial PRIMARY KEY, ID_WAY int, THE_GEOM geometry, PRIORITY int, G double);')
 
         for (Ground ground : handler.grounds) {
             if (ground.priority == 0) {
@@ -309,25 +308,25 @@ def exec(Connection connection, input) {
             if (ground.geom.isEmpty()) {
                 continue
             }
-            sql.execute("INSERT INTO GROUND (ID_WAY, THE_GEOM, PRIORITY, G) VALUES (" + ground.id + ", ST_Transform(ST_GeomFromText('" + ground.geom + "', 4326), " + srid + "), " + ground.priority + ", " + ground.coeff_G + ")")
+            sql.execute('INSERT INTO GROUND (ID_WAY, THE_GEOM, PRIORITY, G) VALUES (' + ground.id + ", ST_Transform(ST_GeomFromText('" + ground.geom + "', 4326), " + srid + '), ' + ground.priority + ', ' + ground.coeff_G + ')')
         }
-        sql.execute("CREATE SPATIAL INDEX IF NOT EXISTS GROUND_GEOM_INDEX ON " + "GROUND" + "(THE_GEOM)")
+        sql.execute('CREATE SPATIAL INDEX IF NOT EXISTS GROUND_GEOM_INDEX ON ' + 'GROUND' + '(THE_GEOM)')
     }
 
     logger.info('SQL INSERT done')
 
-    resultString = "nodes : " + handler.nb_nodes
-    resultString += "<br>\n"
-    resultString += "ways : " + handler.nb_ways
-    resultString += "<br>\n"
-    resultString += "relations : " + handler.nb_relations
-    resultString += "<br>\n"
-    resultString += "buildings : " + handler.nb_buildings
-    resultString += "<br>\n"
-    resultString += "roads : " + handler.nb_roads
-    resultString += "<br>\n"
-    resultString += "grounds : " + handler.nb_grounds
-    resultString += "<br>\n"
+    resultString = 'nodes : ' + handler.nb_nodes
+    resultString += '<br>\n'
+    resultString += 'ways : ' + handler.nb_ways
+    resultString += '<br>\n'
+    resultString += 'relations : ' + handler.nb_relations
+    resultString += '<br>\n'
+    resultString += 'buildings : ' + handler.nb_buildings
+    resultString += '<br>\n'
+    resultString += 'roads : ' + handler.nb_roads
+    resultString += '<br>\n'
+    resultString += 'grounds : ' + handler.nb_grounds
+    resultString += '<br>\n'
 
     logger.info('End : Get Buildings from OSM')
     logger.info('Result : ' + resultString)
@@ -336,21 +335,21 @@ def exec(Connection connection, input) {
 
 public class OsmHandler implements Sink {
 
-    public int nb_ways = 0;
-    public int nb_nodes = 0;
-    public int nb_relations = 0;
-    public int nb_buildings = 0;
-    public int nb_roads = 0;
-    public int nb_grounds = 0;
+    public int nb_ways = 0
+    public int nb_nodes = 0
+    public int nb_relations = 0
+    public int nb_buildings = 0
+    public int nb_roads = 0
+    public int nb_grounds = 0
 
-    Random rand = new Random();
+    Random rand = new SecureRandom()
 
-    public Map<Long, Node> nodes = new HashMap<Long, Node>();
-    public Map<Long, Way> ways = new HashMap<Long, Way>();
-    public Map<Long, Relation> relations = new HashMap<Long, Relation>();
-    public List<Building> buildings = new ArrayList<Building>();
-    public List<Road> roads = new ArrayList<Road>();
-    public List<Ground> grounds = new ArrayList<Ground>();
+    public Map<Long, Node> nodes = new HashMap<Long, Node>()
+    public Map<Long, Way> ways = new HashMap<Long, Way>()
+    public Map<Long, Relation> relations = new HashMap<Long, Relation>()
+    public List<Building> buildings = []
+    public List<Road> roads = []
+    public List<Ground> grounds = []
 
     Logger logger
     boolean ignoreBuildings
@@ -373,17 +372,14 @@ public class OsmHandler implements Sink {
     @Override
     public void process(EntityContainer entityContainer) {
 
-
-
         if (entityContainer instanceof NodeContainer) {
-            nb_nodes++;
-            Node node = ((NodeContainer) entityContainer).getEntity();
-            nodes.put(node.getId(), node);
+            nb_nodes++
+            Node node = ((NodeContainer) entityContainer).getEntity()
+            nodes.put(node.getId(), node)
         } else if (entityContainer instanceof WayContainer) {
 
-
             // This is a copy of the GeoClimate file : buildingsParams.json (https://github.com/orbisgis/geoclimate/tree/master/osm/src/main/resources/org/orbisgis/geoclimate/osm)
-            String buildingParams = """{
+            String buildingParams = '''{
                   "tags": {
                     "building": [],
                     "railway": [
@@ -1044,94 +1040,93 @@ public class OsmHandler implements Sink {
                       ]
                     }
                   }
-                }"""
+                }'''
 
             def parametersMap = new JsonSlurper().parseText(buildingParams)
-            def tags = parametersMap.get("tags")
-            def columnsToKeep = parametersMap.get("columns")
-            def typeBuildings = parametersMap.get("type")
+            def tags = parametersMap.get('tags')
+            def columnsToKeep = parametersMap.get('columns')
+            def typeBuildings = parametersMap.get('type')
 
-            nb_ways++;
-            Way way = ((WayContainer) entityContainer).getEntity();
-            ways.put(way.getId(), way);
-            boolean isBuilding = false;
-            boolean isRoad = false;
-            boolean isTunnel = false;
-            double height = 4.0 + rand.nextDouble() * 2.1;
-            boolean trueHeightFound = false;
-            boolean closedWay = way.isClosed();
+            nb_ways++
+            Way way = ((WayContainer) entityContainer).getEntity()
+            ways.put(way.getId(), way)
+            boolean isBuilding = false
+            boolean isRoad = false
+            boolean isTunnel = false
+            double height = 4.0 + rand.nextDouble() * 2.1
+            boolean trueHeightFound = false
+            boolean closedWay = way.isClosed()
 
             for (Tag tag : way.getTags()) {
-                if (tags.containsKey(tag.getKey()) && closedWay){
-                    if (tags.get(tag.getKey()).isEmpty() || tags.get(tag.getKey()).any{it == (tag.getValue())})
+                if (tags.containsKey(tag.getKey()) && closedWay) { {
+ it == (tag.getValue()) })
                     {
-                        isBuilding = true;
+                        isBuilding = true
                     }
-                }
+            }
 
-                if ( closedWay && columnsToKeep.any{ (it == tag.getKey()) }) {
+                if (closedWay && columnsToKeep.any { (it == tag.getKey()) }) {
                     for (typeHighLevel in typeBuildings) {
                         for (typeLowLevel in typeHighLevel.getValue()) {
                             if (typeLowLevel.getKey() == (tag.getKey())) {
                                 if (typeLowLevel.getValue().any { it == (tag.getValue()) }) {
-                                    isBuilding = true;
-                                }
+                                    isBuilding = true
                             }
-
                         }
                     }
-                }
+        }
+    }
 
-                if ("tunnel".equalsIgnoreCase(tag.getKey()) && "yes".equalsIgnoreCase(tag.getValue())) {
-                    isTunnel = true;
+                if ('tunnel'.equalsIgnoreCase(tag.getKey()) && 'yes'.equalsIgnoreCase(tag.getValue())) {
+                    isTunnel = true
                 }
-                if ("highway".equalsIgnoreCase((tag.getKey()))) {
+                if ('highway'.equalsIgnoreCase((tag.getKey()))) {
                     isRoad = true
                 }
                 if (isBuilding) {
-                    if (!trueHeightFound && "building:levels".equalsIgnoreCase(tag.getKey())) {
-                        height = height - 4 + Double.parseDouble(tag.getValue().replaceAll("[^0-9]+", "")) * 3.0;
+                    if (!trueHeightFound && 'building:levels'.equalsIgnoreCase(tag.getKey())) {
+                        height = height - 4 + Double.parseDouble(tag.getValue().replaceAll('[^0-9]+', '')) * 3.0
                     }
-                    if ("height".equalsIgnoreCase(tag.getKey())) {
-                        height = Double.parseDouble(tag.getValue().replaceAll("[^0-9]+", ""));
-                        trueHeightFound = true;
+                    if ('height'.equalsIgnoreCase(tag.getKey())) {
+                        height = Double.parseDouble(tag.getValue().replaceAll('[^0-9]+', ''))
+                        trueHeightFound = true
                     }
                 }
-            }
+}
             if (!ignoreBuildings && isBuilding && closedWay) {
-                buildings.add(new Building(way, height));
-                nb_buildings++;
+                buildings.add(new Building(way, height))
+                nb_buildings++
             }
             if (!ignoreRoads && isRoad) {
                 if (removeTunnels && isTunnel) {
                     return
                 }
-                roads.add(new Road(way));
-                nb_roads++;
+                roads.add(new Road(way))
+                nb_roads++
             }
             if (!ignoreGround && !isBuilding && !isRoad && closedWay) {
-                grounds.add(new Ground(way));
-                nb_grounds++;
+                grounds.add(new Ground(way))
+                nb_grounds++
             }
         } else if (entityContainer instanceof RelationContainer) {
-            nb_relations++;
-            Relation rel = ((RelationContainer) entityContainer).getEntity();
-            relations.put(rel.getId(), rel);
+            nb_relations++
+            Relation rel = ((RelationContainer) entityContainer).getEntity()
+            relations.put(rel.getId(), rel)
         } else {
-            System.out.println("Unknown Entity!");
+            System.out.println('Unknown Entity!')
         }
     }
 
     @Override
     public void complete() {
-        for(Building building: buildings) {
-            building.setGeom(calculateBuildingGeometry(building.way));
+        for (Building building: buildings) {
+            building.setGeom(calculateBuildingGeometry(building.way))
         }
-        for(Road road: roads) {
-            road.setGeom(calculateRoadGeometry(road.way));
+        for (Road road: roads) {
+            road.setGeom(calculateRoadGeometry(road.way))
         }
-        GeometryFactory geomFactory = new GeometryFactory();
-        for(Ground ground: grounds) {
+        GeometryFactory geomFactory = new GeometryFactory()
+        for (Ground ground: grounds) {
             if (ground.priority == 0) {
                 ground.setGeom(geomFactory.createPolygon())
                 continue
@@ -1142,13 +1137,13 @@ public class OsmHandler implements Sink {
         int doPrint = 2
         for (int j = 0; j < grounds.size(); j++) {
             if (j >= doPrint) {
-                logger.info("Cleaning GROUND geom : " + j + "/" + grounds.size())
+                logger.info('Cleaning GROUND geom : ' + j + '/' + grounds.size())
                 doPrint *= 2
             }
             if (grounds[j].geom.isEmpty() || !grounds[j].geom.isValid()) {
                 continue
             }
-            if (!["Polygon", "MultiPolygon"].contains(grounds[j].geom.geometryType)) {
+            if (!['Polygon', 'MultiPolygon'].contains(grounds[j].geom.geometryType)) {
                 continue
             }
             for (int k = 0; k < grounds.size(); k++) {
@@ -1158,7 +1153,7 @@ public class OsmHandler implements Sink {
                 if (grounds[k].geom.isEmpty() || !grounds[k].geom.isValid()) {
                     continue
                 }
-                if (!["Polygon", "MultiPolygon"].contains(grounds[k].geom.geometryType)) {
+                if (!['Polygon', 'MultiPolygon'].contains(grounds[k].geom.geometryType)) {
                     continue
                 }
                 if (!grounds[j].geom.intersects(grounds[k].geom)) {
@@ -1179,160 +1174,162 @@ public class OsmHandler implements Sink {
     }
 
     public Geometry calculateBuildingGeometry(Way way) {
-        GeometryFactory geomFactory = new GeometryFactory();
+        GeometryFactory geomFactory = new GeometryFactory()
         if (way == null) {
-            return geomFactory.createPolygon();
+            return geomFactory.createPolygon()
         }
-        List<WayNode> wayNodes = way.getWayNodes();
+        List<WayNode> wayNodes = way.getWayNodes()
         if (wayNodes.size() < 4) {
-            return geomFactory.createPolygon();
+            return geomFactory.createPolygon()
         }
-        Coordinate[] shell = new Coordinate[wayNodes.size()];
-        for(int i = 0; i < wayNodes.size(); i++) {
-            Node node = nodes.get(wayNodes.get(i).getNodeId());
+        Coordinate[] shell = new Coordinate[wayNodes.size()]
+        for (int i = 0; i < wayNodes.size(); i++) {
+            Node node = nodes.get(wayNodes.get(i).getNodeId())
             if (node == null) {
-                return geomFactory.createPolygon();
+                return geomFactory.createPolygon()
             }
-            double x = node.getLongitude();
-            double y = node.getLatitude();
-            shell[i] = new Coordinate(x, y, 0.0);
+            double x = node.getLongitude()
+            double y = node.getLatitude()
+            shell[i] = new Coordinate(x, y, 0.0)
         }
-        return geomFactory.createPolygon(shell);
+        return geomFactory.createPolygon(shell)
     }
 
     public Geometry calculateRoadGeometry(Way way) {
-        GeometryFactory geomFactory = new GeometryFactory();
+        GeometryFactory geomFactory = new GeometryFactory()
         if (way == null) {
-            return geomFactory.createLineString();
+            return geomFactory.createLineString()
         }
-        List<WayNode> wayNodes = way.getWayNodes();
+        List<WayNode> wayNodes = way.getWayNodes()
         if (wayNodes.size() < 2) {
-            return geomFactory.createLineString();
+            return geomFactory.createLineString()
         }
-        Coordinate[] coordinates = new Coordinate[wayNodes.size()];
-        for(int i = 0; i < wayNodes.size(); i++) {
-            Node node = nodes.get(wayNodes.get(i).getNodeId());
+        Coordinate[] coordinates = new Coordinate[wayNodes.size()]
+        for (int i = 0; i < wayNodes.size(); i++) {
+            Node node = nodes.get(wayNodes.get(i).getNodeId())
             if (node == null) { // some odd case where a node is defined here but outside of the osm file limits
-                return geomFactory.createLineString();
+                return geomFactory.createLineString()
             }
-            double x = node.getLongitude();
-            double y = node.getLatitude();
-            coordinates[i] = new Coordinate(x, y, 0.0);
+            double x = node.getLongitude()
+            double y = node.getLatitude()
+            coordinates[i] = new Coordinate(x, y, 0.0)
         }
-        return geomFactory.createLineString(coordinates);
+        return geomFactory.createLineString(coordinates)
     }
 
     public Geometry calculateGroundGeometry(Way way) {
-        GeometryFactory geomFactory = new GeometryFactory();
+        GeometryFactory geomFactory = new GeometryFactory()
         if (way == null) {
-            return geomFactory.createPolygon();
+            return geomFactory.createPolygon()
         }
-        List<WayNode> wayNodes = way.getWayNodes();
+        List<WayNode> wayNodes = way.getWayNodes()
         if (wayNodes.size() < 4) {
-            return geomFactory.createPolygon();
+            return geomFactory.createPolygon()
         }
-        Coordinate[] shell = new Coordinate[wayNodes.size()];
+        Coordinate[] shell = new Coordinate[wayNodes.size()]
         for (int i = 0; i < wayNodes.size(); i++) {
-            Node node = nodes.get(wayNodes.get(i).getNodeId());
-            double x = node.getLongitude();
-            double y = node.getLatitude();
-            shell[i] = new Coordinate(x, y, 0.0);
+            Node node = nodes.get(wayNodes.get(i).getNodeId())
+            double x = node.getLongitude()
+            double y = node.getLatitude()
+            shell[i] = new Coordinate(x, y, 0.0)
         }
-        return geomFactory.createPolygon(shell);
+        return geomFactory.createPolygon(shell)
     }
+
 }
 
 public class Building {
 
-    long id;
-    Way way;
-    Geometry geom;
-    double height = 0.0;
+    long id
+    Way way
+    Geometry geom
+    double height = 0.0
 
     Building(Way way) {
-        this.way = way;
-        this.id = way.getId();
-        double h = 4.0 + rand.nextDouble() * 2.1;
-        boolean trueHeightFound = false;
+        this.way = way
+        this.id = way.getId()
+        double h = 4.0 + rand.nextDouble() * 2.1
+        boolean trueHeightFound = false
         for (Tag tag : way.getTags()) {
-            if (!trueHeightFound && "building:levels".equalsIgnoreCase(tag.getKey())) {
-                h = h - 4 + Double.parseDouble(tag.getValue().replaceAll("[^0-9]+", "")) * 3.0;
+            if (!trueHeightFound && 'building:levels'.equalsIgnoreCase(tag.getKey())) {
+                h = h - 4 + Double.parseDouble(tag.getValue().replaceAll('[^0-9]+', '')) * 3.0
             }
-            if ("height".equalsIgnoreCase(tag.getKey())) {
-                h = Double.parseDouble(tag.getValue().replaceAll("[^0-9]+", ""));
-                trueHeightFound = true;
+            if ('height'.equalsIgnoreCase(tag.getKey())) {
+                h = Double.parseDouble(tag.getValue().replaceAll('[^0-9]+', ''))
+                trueHeightFound = true
             }
         }
-        this.height = h;
+        this.height = h
     }
     Building(Way way, double height) {
-        this.way = way;
-        this.id = way.getId();
-        this.height = height;
+        this.way = way
+        this.id = way.getId()
+        this.height = height
     }
 
     void setGeom(Geometry geom) {
-        this.geom = geom;
+        this.geom = geom
     }
 
     void setHeight(double height) {
-        this.height = height;
+        this.height = height
     }
+
 }
 
 public class Road {
 
-    def static aadf_d = [26103, 17936, 7124, 1400, 700, 350, 175]
-    def static aadf_e = [7458, 3826, 1069, 400, 200, 100, 50]
-    def static aadf_n = [3729, 2152, 712, 200, 100, 50, 25]
-    def static hv_d = [0.25, 0.2, 0.2, 0.15, 0.10, 0.05, 0.02]
-    def static hv_e = [0.35, 0.2, 0.15, 0.10, 0.06, 0.02, 0.01]
-    def static hv_n = [0.45, 0.2, 0.1, 0.05, 0.03, 0.01, 0.0]
-    def static speed = [130, 110, 80, 80, 50, 30, 30]
+    static aadf_d = [26103, 17936, 7124, 1400, 700, 350, 175]
+    static aadf_e = [7458, 3826, 1069, 400, 200, 100, 50]
+    static aadf_n = [3729, 2152, 712, 200, 100, 50, 25]
+    static hv_d = [0.25, 0.2, 0.2, 0.15, 0.10, 0.05, 0.02]
+    static hv_e = [0.35, 0.2, 0.15, 0.10, 0.06, 0.02, 0.01]
+    static hv_n = [0.45, 0.2, 0.1, 0.05, 0.03, 0.01, 0.0]
+    static speed = [130, 110, 80, 80, 50, 30, 30]
 
-    def static hours_in_d = 12
-    def static hours_in_e = 4
-    def static hours_in_n = 8
+    static hours_in_d = 12
+    static hours_in_e = 4
+    static hours_in_n = 8
 
-    long id;
-    Way way;
-    Geometry geom;
-    double maxspeed = 0.0;
-    boolean oneway = false;
-    String type = null;
-    int category = 5;
+    long id
+    Way way
+    Geometry geom
+    double maxspeed = 0.0
+    boolean oneway = false
+    String type = null
+    int category = 5
 
     Road(Way way) {
-        this.way = way;
-        this.id = way.getId();
+        this.way = way
+        this.id = way.getId()
         for (Tag tag : way.getTags()) {
-            if ("maxspeed".equalsIgnoreCase(tag.getKey())) {
+            if ('maxspeed'.equalsIgnoreCase(tag.getKey())) {
                 try {
-                    this.maxspeed = Double.parseDouble(tag.getValue().replaceAll("[^0-9]+", ""));
+                    this.maxspeed = Double.parseDouble(tag.getValue().replaceAll('[^0-9]+', ''))
                 }
                 catch (NumberFormatException e) {
-                    // in case maxspeed does not contain a numerical value
+                // in case maxspeed does not contain a numerical value
                 }
-                if (tag.getValue().contains("mph")) {
+                if (tag.getValue().contains('mph')) {
                     maxspeed = maxspeed * 1.60934
                 }
             }
-            if ("highway".equalsIgnoreCase(tag.getKey())) {
-                this.type = tag.getValue();
+            if ('highway'.equalsIgnoreCase(tag.getKey())) {
+                this.type = tag.getValue()
             }
-            if ("highway".equalsIgnoreCase(tag.getKey()) && "yes".equalsIgnoreCase(tag.getValue())) {
+            if ('highway'.equalsIgnoreCase(tag.getKey()) && 'yes'.equalsIgnoreCase(tag.getValue())) {
                 oneway = true
             }
         }
-        updateCategory();
+        updateCategory()
     }
 
     double getNbLV(String period) {
         double lv
-        if (period == "d") {
+        if (period == 'd') {
             lv = (1 - hv_d[category]) * aadf_d[category] / hours_in_d
         }
-        else if (period == "e") {
+        else if (period == 'e') {
             lv = (1 - hv_e[category]) * aadf_e[category] / hours_in_e
         }
         else { // n
@@ -1346,10 +1343,10 @@ public class Road {
 
     double getNbHV(String period) {
         double hv
-        if (period == "d") {
+        if (period == 'd') {
             hv = hv_d[category] * aadf_d[category] / hours_in_d
         }
-        else if (period == "e") {
+        else if (period == 'e') {
             hv = hv_e[category] * aadf_e[category] / hours_in_e
         }
         else { // n
@@ -1362,278 +1359,279 @@ public class Road {
     }
 
     void updateCategory() {
-        if (["motorway", "motorway_link"].contains(type)) {
+        if (['motorway', 'motorway_link'].contains(type)) {
             category = 0
         }
-        if (["trunk", "trunk_link"].contains(type)) {
+        if (['trunk', 'trunk_link'].contains(type)) {
             category = 1
         }
-        if (["primary", "primary_link"].contains(type)) {
+        if (['primary', 'primary_link'].contains(type)) {
             category = 2
         }
-        if (["secondary", "secondary_link"].contains(type)) {
+        if (['secondary', 'secondary_link'].contains(type)) {
             category = 3
         }
-        if (["tertiary", "tertiary_link", "unclassified"].contains(type)) {
+        if (['tertiary', 'tertiary_link', 'unclassified'].contains(type)) {
             category = 4
         }
-        if (["residential"].contains(type)) {
+        if (['residential'].contains(type)) {
             category = 5
         }
-        if (["service", "living_street"].contains(type)) {
+        if (['service', 'living_street'].contains(type)) {
             category = 6
         }
     }
 
     void setGeom(Geometry geom) {
-        this.geom = geom;
+        this.geom = geom
     }
 
     void setHeight(double height) {
-        this.height = height;
+        this.height = height
     }
+
 }
 
 public class Ground {
 
-    long id;
-    Way way;
-    Geometry geom;
+    long id
+    Way way
+    Geometry geom
 
-    int priority = 0;
-    float coeff_G = 0.0;
+    int priority = 0
+    float coeff_G = 0.0
 
     Ground(Way way) {
-        this.way = way;
-        this.id = way.getId();
+        this.way = way
+        this.id = way.getId()
 
-        String primaryTagKey = "";
-        String primaryTagValue = "";
-        String secondaryTagKey = "";
-        String secondaryTagValue = "";
+        String primaryTagKey = ''
+        String primaryTagValue = ''
+        String secondaryTagKey = ''
+        String secondaryTagValue = ''
 
         for (Tag tag : way.getTags()) {
             String key = tag.getKey()
             String value = tag.getValue()
-            if (["aeroway","amenity","landcover","landuse","leisure","natural","water","waterway"].contains(key)) {
+            if (['aeroway', 'amenity', 'landcover', 'landuse', 'leisure', 'natural', 'water', 'waterway'].contains(key)) {
                 primaryTagKey = key
                 primaryTagValue = value
             }
-            if (["parking","covered","surface","wetland"].contains(key)) {
+            if (['parking', 'covered', 'surface', 'wetland'].contains(key)) {
                 secondaryTagKey = key
                 secondaryTagValue = value
             }
         }
-        if (primaryTagKey == "aeroway" &&
-                ["taxiway","runway","aerodrome","helipad","apron","taxilane"].contains(primaryTagValue)) {
+        if (primaryTagKey == 'aeroway' &&
+                ['taxiway', 'runway', 'aerodrome', 'helipad', 'apron', 'taxilane'].contains(primaryTagValue)) {
             priority = 29
             coeff_G = 0.1
-        }
-        if (primaryTagKey == "amenity") {
-            if (primaryTagValue == "taxi") {
+                }
+        if (primaryTagKey == 'amenity') {
+            if (primaryTagValue == 'taxi') {
                 priority = 22
                 coeff_G = 0.1
             }
-            if (primaryTagValue == "parking" && secondaryTagKey == "parking" && !secondaryTagValue.contains("underground")) {
+            if (primaryTagValue == 'parking' && secondaryTagKey == 'parking' && !secondaryTagValue.contains('underground')) {
                 priority = 22
                 coeff_G = 0.1
             }
         }
-        if (primaryTagKey == "landcover") {
-            if (primaryTagValue == "water") {
+        if (primaryTagKey == 'landcover') {
+            if (primaryTagValue == 'water') {
                 priority = 7
                 coeff_G = 0.3
             }
-            if (["bedrock","bare_ground","concrete","asphalt"].contains(primaryTagValue)) {
+            if (['bedrock', 'bare_ground', 'concrete', 'asphalt'].contains(primaryTagValue)) {
                 priority = 8
                 coeff_G = 0.1
             }
-            if (primaryTagValue == "sand") {
+            if (primaryTagValue == 'sand') {
                 priority = 9
                 coeff_G = 0.2
             }
-            if (["scrub","gravel"].contains(primaryTagValue)) {
+            if (['scrub', 'gravel'].contains(primaryTagValue)) {
                 priority = 10
                 coeff_G = 0.7
             }
-            if (["bushes","vegetation"].contains(primaryTagValue)) {
+            if (['bushes', 'vegetation'].contains(primaryTagValue)) {
                 priority = 11
                 coeff_G = 0.8
             }
-            if (["flowerbed","trees, grass","trees","grass","tree","grassland","wood"].contains(primaryTagValue)) {
+            if (['flowerbed', 'trees, grass', 'trees', 'grass', 'tree', 'grassland', 'wood'].contains(primaryTagValue)) {
                 priority = 12
                 coeff_G = 1.0
             }
         }
-        if (primaryTagKey == "landuse") {
-            if (primaryTagValue == "reservoir" && secondaryTagKey == "covered" && secondaryTagValue == "no") {
+        if (primaryTagKey == 'landuse') {
+            if (primaryTagValue == 'reservoir' && secondaryTagKey == 'covered' && secondaryTagValue == 'no') {
                 priority = 7
                 coeff_G = 0.3
             }
-            if (["residential","industrial","retail","harbour","quarry","landfill",
-                 "construction","commercial","garages","railway","basin","farmyard"].contains(primaryTagValue)) {
+            if (['residential', 'industrial', 'retail', 'harbour', 'quarry', 'landfill',
+                 'construction','commercial','garages','railway','basin','farmyard'].contains(primaryTagValue)) {
                 priority = 23
                 coeff_G = 0.1
-            }
-            if (primaryTagValue == "brownfield") {
+                 }
+            if (primaryTagValue == 'brownfield') {
                 priority = 24
                 coeff_G = 0.3
             }
-            if (primaryTagValue == "salt_pond") {
+            if (primaryTagValue == 'salt_pond') {
                 priority = 25
                 coeff_G = 0.5
             }
-            if (["farmland","allotements","logging","plant_nursery","farm"].contains(primaryTagValue)) {
+            if (['farmland', 'allotements', 'logging', 'plant_nursery', 'farm'].contains(primaryTagValue)) {
                 priority = 26
                 coeff_G = 0.7
             }
-            if (["vineyard","orchard","greenfield","village_green"].contains(primaryTagValue)) {
+            if (['vineyard', 'orchard', 'greenfield', 'village_green'].contains(primaryTagValue)) {
                 priority = 27
                 coeff_G = 0.8
             }
-            if (["meadow","forest","grass"].contains(primaryTagValue)) {
+            if (['meadow', 'forest', 'grass'].contains(primaryTagValue)) {
                 priority = 28
                 coeff_G = 1.0
             }
         }
-        if (primaryTagKey == "leisure") {
-            if (primaryTagValue == "pitch" && secondaryTagKey == "surface") {
-                if (["asphalt","concrete","concrete:plate"].contains(secondaryTagValue)) {
+        if (primaryTagKey == 'leisure') {
+            if (primaryTagValue == 'pitch' && secondaryTagKey == 'surface') {
+                if (['asphalt', 'concrete', 'concrete:plate'].contains(secondaryTagValue)) {
                     priority = 1
                     coeff_G = 0.1
                 }
-                if (["dirt","compacted","sand","wood","clay"].contains(secondaryTagValue)) {
+                if (['dirt', 'compacted', 'sand', 'wood', 'clay'].contains(secondaryTagValue)) {
                     priority = 2
                     coeff_G = 0.2
                 }
-                if (["ground","fine_gravel","earth","mud"].contains(secondaryTagValue)) {
+                if (['ground', 'fine_gravel', 'earth', 'mud'].contains(secondaryTagValue)) {
                     priority = 4
                     coeff_G = 0.5
                 }
-                if (["gravel"].contains(secondaryTagValue)) {
+                if (['gravel'].contains(secondaryTagValue)) {
                     priority = 5
                     coeff_G = 0.7
                 }
-                if (["grass"].contains(secondaryTagValue)) {
+                if (['grass'].contains(secondaryTagValue)) {
                     priority = 6
                     coeff_G = 1.0
                 }
             }
-            if (primaryTagValue == "marina") {
+            if (primaryTagValue == 'marina') {
                 priority = 30
                 coeff_G = 0.2
             }
-            if (primaryTagValue == "park") {
+            if (primaryTagValue == 'park') {
                 priority = 31
                 coeff_G = 0.7
             }
-            if (["garden","nature_reserve","golf_course"].contains(primaryTagValue)) {
+            if (['garden', 'nature_reserve', 'golf_course'].contains(primaryTagValue)) {
                 priority = 32
                 coeff_G = 1.0
             }
         }
-        if (primaryTagKey == "natural") {
-            if (primaryTagValue == "beach" && secondaryTagKey == "surface") {
-                if (secondaryTagValue == "sand") {
+        if (primaryTagKey == 'natural') {
+            if (primaryTagValue == 'beach' && secondaryTagKey == 'surface') {
+                if (secondaryTagValue == 'sand') {
                     priority = 2
                     coeff_G = 0.2
                 }
-                if (secondaryTagValue == "shingle") {
+                if (secondaryTagValue == 'shingle') {
                     priority = 3
                     coeff_G = 0.3
                 }
-                if (secondaryTagValue == "gravel" || secondaryTagValue == "pebbles") {
+                if (secondaryTagValue == 'gravel' || secondaryTagValue == 'pebbles') {
                     priority = 5
                     coeff_G = 0.7
                 }
             }
-            if (primaryTagValue == "wetland" && secondaryTagKey == "wetland") {
-                if (secondaryTagValue == "tidalflat") {
+            if (primaryTagValue == 'wetland' && secondaryTagKey == 'wetland') {
+                if (secondaryTagValue == 'tidalflat') {
                     priority = 14
                     coeff_G = 0.2
                 }
-                if (secondaryTagValue == "saltern") {
+                if (secondaryTagValue == 'saltern') {
                     priority = 15
                     coeff_G = 0.3
                 }
-                if (secondaryTagValue == "marsh") {
+                if (secondaryTagValue == 'marsh') {
                     priority = 16
                     coeff_G = 0.4
                 }
-                if (secondaryTagValue == "reebed") {
+                if (secondaryTagValue == 'reebed') {
                     priority = 18
                     coeff_G = 0.6
                 }
-                if (secondaryTagValue == "bog") {
+                if (secondaryTagValue == 'bog') {
                     priority = 19
                     coeff_G = 0.7
                 }
-                if (secondaryTagValue == "mangrove") {
+                if (secondaryTagValue == 'mangrove') {
                     priority = 21
                     coeff_G = 1.0
                 }
-                if (["swamp","saltmarsh","wet_meadow"].contains(secondaryTagValue)) {
+                if (['swamp', 'saltmarsh', 'wet_meadow'].contains(secondaryTagValue)) {
                     priority = 20
                     coeff_G = 0.9
                 }
             }
-            if (primaryTagValue == "bare_rock") {
+            if (primaryTagValue == 'bare_rock') {
                 priority = 13
                 coeff_G = 0.1
             }
-            if (primaryTagValue == "bay") {
+            if (primaryTagValue == 'bay') {
                 priority = 7
                 coeff_G = 0.3
             }
-            if (primaryTagValue == "glacier") {
+            if (primaryTagValue == 'glacier') {
                 priority = 13
                 coeff_G = 0.1
             }
-            if (primaryTagValue == "heath" || primaryTagValue == "grassland") {
+            if (primaryTagValue == 'heath' || primaryTagValue == 'grassland') {
                 priority = 21
                 coeff_G = 1.0
             }
-            if (primaryTagValue == "rock") {
+            if (primaryTagValue == 'rock') {
                 priority = 13
                 coeff_G = 0.1
             }
-            if (primaryTagValue == "sand") {
+            if (primaryTagValue == 'sand') {
                 priority = 14
                 coeff_G = 0.2
             }
-            if (primaryTagValue == "scree") {
+            if (primaryTagValue == 'scree') {
                 priority = 17
                 coeff_G = 0.5
             }
-            if (primaryTagValue == "scrub") {
+            if (primaryTagValue == 'scrub') {
                 priority = 19
                 coeff_G = 0.7
             }
-            if (primaryTagValue == "shingle") {
+            if (primaryTagValue == 'shingle') {
                 priority = 15
                 coeff_G = 0.3
             }
-            if (primaryTagValue == "water") {
+            if (primaryTagValue == 'water') {
                 priority = 7
                 coeff_G = 0.3
             }
-            if (primaryTagValue == "wood") {
+            if (primaryTagValue == 'wood') {
                 priority = 21
                 coeff_G = 1.0
             }
         }
-        if (primaryTagKey == "water") {
-            if (["pond","lake","reservoir","river","wastewater","canal","oxbow",
-                 "salt","lagoon","yes","ditch","salt_pool","tidal","stream",
-                 "fishpond","riverbank","pool","lock","natural","shallow",
-                 "salt_pond","lake;pond","marsh","well","reflecting_pool",
-                 "fountain","stream;river","not_deep"].contains(primaryTagValue)) {
+        if (primaryTagKey == 'water') {
+            if (['pond', 'lake', 'reservoir', 'river', 'wastewater', 'canal', 'oxbow',
+                 'salt','lagoon','yes','ditch','salt_pool','tidal','stream',
+                 'fishpond','riverbank','pool','lock','natural','shallow',
+                 'salt_pond','lake;pond','marsh','well','reflecting_pool',
+                 'fountain','stream;river','not_deep'].contains(primaryTagValue)) {
                 priority = 7
                 coeff_G = 0.3
-            }
+                 }
         }
-        if (primaryTagKey == "waterway") {
-            if (["stream","riverbank","canal","artificial"].contains(primaryTagValue)) {
+        if (primaryTagKey == 'waterway') {
+            if (['stream', 'riverbank', 'canal', 'artificial'].contains(primaryTagValue)) {
                 priority = 7
                 coeff_G = 0.3
             }
@@ -1641,7 +1639,7 @@ public class Ground {
     }
 
     void setGeom(Geometry geom) {
-        this.geom = geom;
+        this.geom = geom
     }
-}
 
+}
