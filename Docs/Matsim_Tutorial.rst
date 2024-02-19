@@ -284,6 +284,3 @@ And the final result, between 10h00 and 10h15 :
 
 .. figure:: images/matsim/results_10h_qgis.png
    :align: center
-
-
-

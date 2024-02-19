@@ -9,7 +9,6 @@
  * Contact: contact@noise-planet.org
  *
  */
-
 /**
  * @Author Pierre Aumond, Université Gustave Eiffel
  * @Author Nicolas Fortin, Université Gustave Eiffel
@@ -63,7 +62,7 @@ inputs = [
                              'The table must contain: </br> <ul>' +
                              '<li> <b> THE_GEOM </b>: the 2D geometry of the building (POLYGON or MULTIPOLYGON) </li>' +
                              '<li> <b> HEIGHT </b>: the height of the building (FLOAT)</li> </ul>',
-                type       : String.class
+                type       : String
         ],
         tableRoads              : [
                 name       : 'Roads table name',
@@ -91,7 +90,7 @@ inputs = [
                              '<li><b> WAY </b> : Define the way of the road section. 1 = one way road section and the traffic goes in the same way that the slope definition you have used, 2 = one way road section and the traffic goes in the inverse way that the slope definition you have used, 3 = bi-directional traffic flow, the flow is split into two components and correct half for uphill and half for downhill (INTEGER)</li>' +
                              '</ul></br>'+
                              '&#128161; This table can be generated from the WPS Block "Import_OSM"',
-                type       : String.class
+                type       : String
         ],
         tableReceivers          : [
                 name       : 'Receivers table name',
@@ -101,7 +100,7 @@ inputs = [
                              '<li><b> PK </b> : an identifier. It shall be a primary key (INTEGER, PRIMARY KEY) </li> ' +
                              '<li><b> THE_GEOM </b> : the 3D geometry of the sources (POINT, MULTIPOINT) </li> </ul>' +
                              '&#128161; This table can be generated from the WPS Blocks in the "Receivers" folder',
-                type       : String.class
+                type       : String
         ],
         tableDEM                : [
                 name       : 'DEM table name',
@@ -111,7 +110,7 @@ inputs = [
                              '<li><b> THE_GEOM </b>: the 3D geometry of the sources (POINT, MULTIPOINT).</li> </ul>' +
                              '&#128161; This table can be generated from the WPS Block "Import_Asc_File"',
                 min        : 0, max: 1,
-                type       : String.class
+                type       : String
         ],
         tableGroundAbs          : [
                 name       : 'Ground absorption table name',
@@ -121,7 +120,7 @@ inputs = [
                              '<li> <b> THE_GEOM </b>: the 2D geometry of the sources (POLYGON or MULTIPOLYGON)</li>' +
                              '<li> <b> G </b>: the acoustic absorption of a ground (FLOAT between 0 : very hard and 1 : very soft)</li> </ul>',
                 min        : 0, max: 1,
-                type       : String.class
+                type       : String
         ],
         paramWallAlpha          : [
                 name       : 'wallAlpha',
@@ -132,7 +131,7 @@ inputs = [
                              '<li> to strictly less than 1 : fully reflective. </li> </ul>' +
                              '&#128736; Default value: <b>0.1 </b> ',
                 min        : 0, max: 1,
-                type       : String.class
+                type       : String
         ],
         confReflOrder           : [
                 name       : 'Order of reflexion',
@@ -141,7 +140,7 @@ inputs = [
                              '&#x1F6A8; Adding 1 order of reflexion can significantly increase the processing time. </br> </br>' +
                              '&#128736; Default value: <b>1 </b>',
                 min        : 0, max: 1,
-                type       : String.class
+                type       : String
         ],
         confMaxSrcDist          : [
                 name       : 'Maximum source-receiver distance',
@@ -149,7 +148,7 @@ inputs = [
                 description: 'Maximum distance between source and receiver (FLOAT, in meters). </br> </br>' +
                              '&#128736; Default value: <b>150 </b>',
                 min        : 0, max: 1,
-                type       : String.class
+                type       : String
         ],
         confMaxReflDist         : [
                 name       : 'Maximum source-reflexion distance',
@@ -157,7 +156,7 @@ inputs = [
                 description: 'Maximum reflection distance from the source (FLOAT, in meters). </br> </br>' +
                              '&#128736; Default value: <b>50 </b>',
                 min        : 0, max: 1,
-                type       : String.class
+                type       : String
         ],
         confThreadNumber        : [
                 name       : 'Thread number',
@@ -167,7 +166,7 @@ inputs = [
                              'If it is set to 0, use the maximum number of cores available.</br> </br>' +
                              '&#128736; Default value: <b>0 </b>',
                 min        : 0, max: 1,
-                type       : String.class
+                type       : String
         ],
         confDiffVertical        : [
                 name       : 'Diffraction on vertical edges',
@@ -175,7 +174,7 @@ inputs = [
                 description: 'Compute or not the diffraction on vertical edges. Following Directive 2015/996, enable this option for rail and industrial sources only. </br> </br>' +
                              '&#128736; Default value: <b>false </b>',
                 min        : 0, max: 1,
-                type       : Boolean.class
+                type       : Boolean
         ],
         confDiffHorizontal      : [
                 name       : 'Diffraction on horizontal edges',
@@ -183,7 +182,7 @@ inputs = [
                 description: 'Compute or not the diffraction on horizontal edges. </br> </br>' +
                              '&#128736; Default value: <b>false </b>',
                 min        : 0, max: 1,
-                type       : Boolean.class
+                type       : Boolean
         ],
         confSkipLday            : [
                 name       : 'Skip LDAY_GEOM table',
@@ -191,54 +190,54 @@ inputs = [
                 description: 'Skip the creation of this table. </br> </br>' +
                              '&#128736; Default value: <b>false </b>',
                 min        : 0, max: 1,
-                type       : Boolean.class
+                type       : Boolean
         ],
         confSkipLevening        :
                 [name       : 'Skip LEVENING_GEOM table',
                  title      : 'Do not compute LEVENING_GEOM table',
                  description: 'Skip the creation of this table. </br> </br> ' +
                               '&#128736; Default value: <b>false </b>',
-                 min        : 0, max: 1, 
-                 type: Boolean.class
+                 min        : 0, max: 1,
+                 type: Boolean
                 ],
         confSkipLnight          : [
                 name       : 'Skip LNIGHT_GEOM table',
                 title      : 'Do not compute LNIGHT_GEOM table',
                 description: 'Skip the creation of this table. </br> </br>' +
                              '&#128736; Default value: <b>false </b>',
-                min        : 0, max: 1, type: Boolean.class
+                min        : 0, max: 1, type: Boolean
         ],
         confSkipLden            : [
                 name       : 'Skip LDEN_GEOM table',
                 title      : 'Do not compute LDEN_GEOM table',
                 description: 'Skip the creation of this table. </br> </br>' +
                              '&#128736; Default value : <b> false </b>',
-                min        : 0, max: 1, 
-                type: Boolean.class
+                min        : 0, max: 1,
+                type: Boolean
         ],
         confExportSourceId      : [
                 name       : 'keep source id',
                 title      : 'Separate receiver level by source identifier',
                 description: 'Keep source identifier in output in order to get noise contribution of each noise source. </br> </br>' +
                              '&#128736; Default value: <b> false </b>',
-                min        : 0, max: 1, 
-                type: Boolean.class
+                min        : 0, max: 1,
+                type: Boolean
         ],
         confHumidity            : [
                 name       : 'Relative humidity',
                 title      : 'Relative humidity',
                 description: '&#127783; Humidity for noise propagation. </br> </br>' +
                              '&#128736; Default value: <b> 70</b>',
-                min        : 0, max: 1, 
-                type: Double.class
+                min        : 0, max: 1,
+                type: Double
         ],
         confTemperature         : [
                 name       : 'Temperature',
                 title      : 'Air temperature',
-                description: '&#127777; Air temperature in degree celsius. </br> </br>' + 
+                description: '&#127777; Air temperature in degree celsius. </br> </br>' +
                              '&#128736; Default value: <b> 15</b>',
-                min        : 0, max: 1, 
-                type: Double.class
+                min        : 0, max: 1,
+                type: Double
         ],
         confFavorableOccurrencesDay: [
                 name       : 'Probability of occurrences (Day)',
@@ -250,7 +249,7 @@ inputs = [
                              '<li>The last column 360&#176; contains occurrences between 348.75&#176; to 360&#176; and 0 to 11.25&#176;</li></ul>' +
                              '&#128736; Default value: <b>0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5</b>',
                 min        : 0, max: 1,
-                type       : String.class
+                type       : String
         ],
         confFavorableOccurrencesEvening: [
                 name       : 'Probability of occurrences (Evening)',
@@ -262,7 +261,7 @@ inputs = [
                              '<li>The last column 360&#176; contains occurrences between 348.75&#176; to 360&#176; and 0 to 11.25&#176;</li></ul>' +
                              '&#128736; Default value: <b>0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5</b>',
                 min        : 0, max: 1,
-                type       : String.class
+                type       : String
         ],
         confFavorableOccurrencesNight: [
                 name       : 'Probability of occurrences (Night)',
@@ -274,7 +273,7 @@ inputs = [
                              '<li>The last column 360&#176; contains occurrences between 348.75&#176; to 360&#176; and 0 to 11.25&#176;</li></ul>' +
                              '&#128736; Default value: <b>0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5</b>',
                 min        : 0, max: 1,
-                type       : String.class
+                type       : String
         ],
         confRaysName            : [
                 name       : '',
@@ -283,8 +282,8 @@ inputs = [
                              'You can set a table name here in order to save all the rays computed by NoiseModelling. </br> </br>' +
                              'The number of rays has been limited in this script in order to avoid memory exception. </br> </br>' +
                              '&#128736; Default value: <b>empty (do not keep rays)</b>',
-                min        : 0, max: 1, 
-                type: String.class
+                min        : 0, max: 1,
+                type: String
         ]
 ]
 
@@ -293,7 +292,7 @@ outputs = [
                 name       : 'Result output string',
                 title      : 'Result output string',
                 description: 'This type of result does not allow the blocks to be linked together.',
-                type       : String.class
+                type       : String
         ]
 ]
 
@@ -309,11 +308,10 @@ static Connection openGeoserverDataStoreConnection(String dbName) {
 
 // run the script
 def run(input) {
-
     // Get name of the database
     // by default an embedded h2gis database is created
     // Advanced user can replace this database for a postGis or h2Gis server database.
-    String dbName = "h2gisdb"
+    String dbName = 'h2gisdb'
 
     // Open connection
     openGeoserverDataStoreConnection(dbName).withCloseable {
@@ -324,77 +322,75 @@ def run(input) {
 
 def forgeCreateTable(Sql sql, String tableName, LDENConfig ldenConfig, String geomField, String tableReceiver, String tableResult) {
     // Create a logger to display messages in the geoserver logs and in the command prompt.
-    Logger logger = LoggerFactory.getLogger("org.noise_planet.noisemodelling")
+    Logger logger = LoggerFactory.getLogger('org.noise_planet.noisemodelling')
 
-    StringBuilder sb = new StringBuilder("create table ");
-    sb.append(tableName);
+    StringBuilder sb = new StringBuilder('create table ')
+    sb.append(tableName)
     if (!ldenConfig.mergeSources) {
-        sb.append(" (IDRECEIVER bigint NOT NULL");
-        sb.append(", IDSOURCE bigint NOT NULL");
+        sb.append(' (IDRECEIVER bigint NOT NULL')
+        sb.append(', IDSOURCE bigint NOT NULL')
     } else {
-        sb.append(" (IDRECEIVER bigint NOT NULL");
+        sb.append(' (IDRECEIVER bigint NOT NULL')
     }
-    sb.append(", THE_GEOM geometry")
-    PropagationProcessPathData pathData = ldenConfig.getPropagationProcessPathData(LDENConfig.TIME_PERIOD.DAY);
+    sb.append(', THE_GEOM geometry')
+    PropagationProcessPathData pathData = ldenConfig.getPropagationProcessPathData(LDENConfig.TIME_PERIOD.DAY)
     for (int idfreq = 0; idfreq < pathData.freq_lvl.size(); idfreq++) {
-        sb.append(", HZ");
-        sb.append(pathData.freq_lvl.get(idfreq));
-        sb.append(" REAL");
+        sb.append(', HZ')
+        sb.append(pathData.freq_lvl.get(idfreq))
+        sb.append(' REAL')
     }
-    sb.append(", LAEQ REAL, LEQ REAL ) AS SELECT PK");
+    sb.append(', LAEQ REAL, LEQ REAL ) AS SELECT PK')
     if (!ldenConfig.mergeSources) {
-        sb.append(", IDSOURCE");
+        sb.append(', IDSOURCE')
     }
-    sb.append(", ")
+    sb.append(', ')
     sb.append(geomField)
     for (int idfreq = 0; idfreq < pathData.freq_lvl.size(); idfreq++) {
-        sb.append(", HZ");
-        sb.append(pathData.freq_lvl.get(idfreq));
+        sb.append(', HZ')
+        sb.append(pathData.freq_lvl.get(idfreq))
     }
-    sb.append(", LAEQ, LEQ FROM ")
+    sb.append(', LAEQ, LEQ FROM ')
     sb.append(tableReceiver)
     if (!ldenConfig.mergeSources) {
         // idsource can't be null so we can't left join
-        sb.append(" a, ")
+        sb.append(' a, ')
         sb.append(tableResult)
-        sb.append(" b WHERE a.PK = b.IDRECEIVER")
+        sb.append(' b WHERE a.PK = b.IDRECEIVER')
     } else {
-        sb.append(" a LEFT JOIN ")
+        sb.append(' a LEFT JOIN ')
         sb.append(tableResult)
-        sb.append(" b ON a.PK = b.IDRECEIVER")
+        sb.append(' b ON a.PK = b.IDRECEIVER')
     }
     sql.execute(sb.toString())
     // apply pk
-    logger.info("Add primary key on " + tableName)
+    logger.info('Add primary key on ' + tableName)
     if (!ldenConfig.mergeSources) {
-        sql.execute("ALTER TABLE " + tableName + " ADD PRIMARY KEY(IDRECEIVER, IDSOURCE)")
+        sql.execute('ALTER TABLE ' + tableName + ' ADD PRIMARY KEY(IDRECEIVER, IDSOURCE)')
     } else {
-        sql.execute("ALTER TABLE " + tableName + " ADD PRIMARY KEY(IDRECEIVER)")
+        sql.execute('ALTER TABLE ' + tableName + ' ADD PRIMARY KEY(IDRECEIVER)')
     }
 }
-
 
 static void exportScene(String name, ProfileBuilder builder, ComputeRaysOutAttenuation result, int crs) throws IOException {
     try {
-        FileOutputStream outData = new FileOutputStream(name);
-        KMLDocument kmlDocument = new KMLDocument(outData);
-        kmlDocument.setInputCRS("EPSG:" + crs);
-        kmlDocument.writeHeader();
-        if(builder != null) {
-            kmlDocument.writeTopographic(builder.getTriangles(), builder.getVertices());
+        FileOutputStream outData = new FileOutputStream(name)
+        KMLDocument kmlDocument = new KMLDocument(outData)
+        kmlDocument.setInputCRS('EPSG:' + crs)
+        kmlDocument.writeHeader()
+        if (builder != null) {
+            kmlDocument.writeTopographic(builder.getTriangles(), builder.getVertices())
         }
-        if(result != null) {
-            kmlDocument.writeRays(result.getPropagationPaths());
+        if (result != null) {
+            kmlDocument.writeRays(result.getPropagationPaths())
         }
-        if(builder != null) {
-            kmlDocument.writeBuildings(builder);
+        if (builder != null) {
+            kmlDocument.writeBuildings(builder)
         }
-        kmlDocument.writeFooter();
+        kmlDocument.writeFooter()
     } catch (XMLStreamException | CoordinateOperationException | CRSException ex) {
-        throw new IOException(ex);
+        throw new IOException(ex)
     }
 }
-
 
 // main function of the script
 def exec(Connection connection, input) {
@@ -408,11 +404,11 @@ def exec(Connection connection, input) {
     String resultString = null
 
     // Create a logger to display messages in the geoserver logs and in the command prompt.
-    Logger logger = LoggerFactory.getLogger("org.noise_planet.noisemodelling")
+    Logger logger = LoggerFactory.getLogger('org.noise_planet.noisemodelling')
 
     // print to command window
     logger.info('Start : Noise level from Traffic')
-    logger.info("inputs {}", input) // log inputs of the run
+    logger.info('inputs {}', input) // log inputs of the run
 
     // -------------------
     // Get every inputs
@@ -423,20 +419,20 @@ def exec(Connection connection, input) {
     sources_table_name = sources_table_name.toUpperCase()
     // Check if srid are in metric projection.
     int sridSources = GeometryTableUtilities.getSRID(connection, TableLocation.parse(sources_table_name))
-    if (sridSources == 3785 || sridSources == 4326) throw new IllegalArgumentException("Error : Please use a metric projection for "+sources_table_name+".")
-    if (sridSources == 0) throw new IllegalArgumentException("Error : The table "+sources_table_name+" does not have an associated SRID.")
+    if (sridSources == 3785 || sridSources == 4326) throw new IllegalArgumentException('Error : Please use a metric projection for ' + sources_table_name + '.')
+    if (sridSources == 0) throw new IllegalArgumentException('Error : The table ' + sources_table_name + ' does not have an associated SRID.')
 
     //Get the geometry field of the source table
     TableLocation sourceTableIdentifier = TableLocation.parse(sources_table_name)
     List<String> geomFields = GeometryTableUtilities.getGeometryColumnNames(connection, sourceTableIdentifier)
     if (geomFields.isEmpty()) {
-        throw new SQLException(String.format("The table %s does not exists or does not contain a geometry field", sourceTableIdentifier))
+        throw new SQLException(String.format('The table %s does not exists or does not contain a geometry field', sourceTableIdentifier))
     }
 
     //Get the primary key field of the source table
     int pkIndex = JDBCUtilities.getIntegerPrimaryKey(connection, TableLocation.parse(sources_table_name))
     if (pkIndex < 1) {
-        throw new IllegalArgumentException(String.format("Source table %s does not contain a primary key", sourceTableIdentifier))
+        throw new IllegalArgumentException(String.format('Source table %s does not contain a primary key', sourceTableIdentifier))
     }
 
     String receivers_table_name = input['tableReceivers']
@@ -446,19 +442,18 @@ def exec(Connection connection, input) {
     TableLocation receiverTableIdentifier = TableLocation.parse(receivers_table_name)
     List<String> geomFieldsRcv = GeometryTableUtilities.getGeometryColumnNames(connection, receiverTableIdentifier)
     if (geomFieldsRcv.isEmpty()) {
-        throw new SQLException(String.format("The table %s does not exists or does not contain a geometry field", receiverTableIdentifier))
+        throw new SQLException(String.format('The table %s does not exists or does not contain a geometry field', receiverTableIdentifier))
     }
     // Check if srid are in metric projection and are all the same.
     int sridReceivers = GeometryTableUtilities.getSRID(connection, TableLocation.parse(receivers_table_name))
-    if (sridReceivers == 3785 || sridReceivers == 4326) throw new IllegalArgumentException("Error : Please use a metric projection for "+receivers_table_name+".")
-    if (sridReceivers == 0) throw new IllegalArgumentException("Error : The table "+receivers_table_name+" does not have an associated SRID.")
-    if (sridReceivers != sridSources) throw new IllegalArgumentException("Error : The SRID of table "+sources_table_name+" and "+receivers_table_name+" are not the same.")
-
+    if (sridReceivers == 3785 || sridReceivers == 4326) throw new IllegalArgumentException('Error : Please use a metric projection for ' + receivers_table_name + '.')
+    if (sridReceivers == 0) throw new IllegalArgumentException('Error : The table ' + receivers_table_name + ' does not have an associated SRID.')
+    if (sridReceivers != sridSources) throw new IllegalArgumentException('Error : The SRID of table ' + sources_table_name + ' and ' + receivers_table_name + ' are not the same.')
 
     //Get the primary key field of the receiver table
     int pkIndexRecv = JDBCUtilities.getIntegerPrimaryKey(connection, TableLocation.parse(receivers_table_name))
     if (pkIndexRecv < 1) {
-        throw new IllegalArgumentException(String.format("Source table %s does not contain a primary key", receiverTableIdentifier))
+        throw new IllegalArgumentException(String.format('Source table %s does not contain a primary key', receiverTableIdentifier))
     }
 
     String building_table_name = input['tableBuilding']
@@ -466,33 +461,32 @@ def exec(Connection connection, input) {
     building_table_name = building_table_name.toUpperCase()
     // Check if srid are in metric projection and are all the same.
     int sridBuildings = GeometryTableUtilities.getSRID(connection, TableLocation.parse(building_table_name))
-    if (sridBuildings == 3785 || sridReceivers == 4326) throw new IllegalArgumentException("Error : Please use a metric projection for "+building_table_name+".")
-    if (sridBuildings == 0) throw new IllegalArgumentException("Error : The table "+building_table_name+" does not have an associated SRID.")
-    if (sridReceivers != sridBuildings) throw new IllegalArgumentException("Error : The SRID of table "+building_table_name+" and "+receivers_table_name+" are not the same.")
+    if (sridBuildings == 3785 || sridReceivers == 4326) throw new IllegalArgumentException('Error : Please use a metric projection for ' + building_table_name + '.')
+    if (sridBuildings == 0) throw new IllegalArgumentException('Error : The table ' + building_table_name + ' does not have an associated SRID.')
+    if (sridReceivers != sridBuildings) throw new IllegalArgumentException('Error : The SRID of table ' + building_table_name + ' and ' + receivers_table_name + ' are not the same.')
 
-    String dem_table_name = ""
+    String dem_table_name = ''
     if (input['tableDEM']) {
         dem_table_name = input['tableDEM']
         // do it case-insensitive
         dem_table_name = dem_table_name.toUpperCase()
         // Check if srid are in metric projection and are all the same.
         int sridDEM = GeometryTableUtilities.getSRID(connection, TableLocation.parse(dem_table_name))
-        if (sridDEM == 3785 || sridReceivers == 4326) throw new IllegalArgumentException("Error : Please use a metric projection for "+dem_table_name+".")
-        if (sridDEM == 0) throw new IllegalArgumentException("Error : The table "+dem_table_name+" does not have an associated SRID.")
-        if (sridDEM != sridSources) throw new IllegalArgumentException("Error : The SRID of table "+sources_table_name+" and "+dem_table_name+" are not the same.")
+        if (sridDEM == 3785 || sridReceivers == 4326) throw new IllegalArgumentException('Error : Please use a metric projection for ' + dem_table_name + '.')
+        if (sridDEM == 0) throw new IllegalArgumentException('Error : The table ' + dem_table_name + ' does not have an associated SRID.')
+        if (sridDEM != sridSources) throw new IllegalArgumentException('Error : The SRID of table ' + sources_table_name + ' and ' + dem_table_name + ' are not the same.')
     }
 
-
-    String ground_table_name = ""
+    String ground_table_name = ''
     if (input['tableGroundAbs']) {
         ground_table_name = input['tableGroundAbs']
         // do it case-insensitive
         ground_table_name = ground_table_name.toUpperCase()
         // Check if srid are in metric projection and are all the same.
         int sridGROUND = GeometryTableUtilities.getSRID(connection, TableLocation.parse(ground_table_name))
-        if (sridGROUND == 3785 || sridReceivers == 4326) throw new IllegalArgumentException("Error : Please use a metric projection for "+ground_table_name+".")
-        if (sridGROUND == 0) throw new IllegalArgumentException("Error : The table "+ground_table_name+" does not have an associated SRID.")
-        if (sridGROUND != sridSources) throw new IllegalArgumentException("Error : The SRID of table "+ground_table_name+" and "+sources_table_name+" are not the same.")
+        if (sridGROUND == 3785 || sridReceivers == 4326) throw new IllegalArgumentException('Error : Please use a metric projection for ' + ground_table_name + '.')
+        if (sridGROUND == 0) throw new IllegalArgumentException('Error : The table ' + ground_table_name + ' does not have an associated SRID.')
+        if (sridGROUND != sridSources) throw new IllegalArgumentException('Error : The SRID of table ' + ground_table_name + ' and ' + sources_table_name + ' are not the same.')
     }
 
     int reflexion_order = 0
@@ -530,27 +524,27 @@ def exec(Connection connection, input) {
         compute_horizontal_diffraction = input['confDiffHorizontal']
     }
 
-    boolean confSkipLday = false;
+    boolean confSkipLday = false
     if (input['confSkipLday']) {
         confSkipLday = input['confSkipLday']
     }
 
-    boolean confSkipLevening = false;
+    boolean confSkipLevening = false
     if (input['confSkipLevening']) {
         confSkipLevening = input['confSkipLevening']
     }
 
-    boolean confSkipLnight = false;
+    boolean confSkipLnight = false
     if (input['confSkipLnight']) {
         confSkipLnight = input['confSkipLnight']
     }
 
-    boolean confSkipLden = false;
+    boolean confSkipLden = false
     if (input['confSkipLden']) {
         confSkipLden = input['confSkipLden']
     }
 
-    boolean confExportSourceId = false;
+    boolean confExportSourceId = false
     if (input['confExportSourceId']) {
         confExportSourceId = input['confExportSourceId']
     }
@@ -578,34 +572,33 @@ def exec(Connection connection, input) {
     int maximumRaysToExport = 5000
 
     File folderExportKML = null
-    String kmlFileNamePrepend = ""
+    String kmlFileNamePrepend = ''
     if (input['confRaysName'] && !((input['confRaysName'] as String).isEmpty())) {
         String confRaysName = input['confRaysName'] as String
-        if(confRaysName.startsWith("file:")) {
+        if (confRaysName.startsWith('file:')) {
             ldenConfig.setExportRaysMethod(LDENConfig.ExportRaysMethods.TO_MEMORY)
             URL url = new URL(confRaysName)
             File urlFile = new File(url.toURI())
-            if(urlFile.isDirectory()) {
+            if (urlFile.isDirectory()) {
                 folderExportKML = urlFile
             } else {
                 folderExportKML = urlFile.getParentFile()
                 kmlFileNamePrepend = confRaysName.substring(
                         Math.max(0, confRaysName.lastIndexOf(File.separator) + 1),
-                        Math.max(0, confRaysName.lastIndexOf(".")))
+                        Math.max(0, confRaysName.lastIndexOf('.')))
             }
         } else {
             ldenConfig.setExportRaysMethod(LDENConfig.ExportRaysMethods.TO_RAYS_TABLE)
             ldenConfig.setRaysTable(input['confRaysName'] as String)
         }
-        ldenConfig.setKeepAbsorption(true);
-        ldenConfig.setMaximumRaysOutputCount(maximumRaysToExport);
+        ldenConfig.setKeepAbsorption(true)
+        ldenConfig.setMaximumRaysOutputCount(maximumRaysToExport)
     }
 
     LDENPointNoiseMapFactory ldenProcessing = new LDENPointNoiseMapFactory(connection, ldenConfig)
     pointNoiseMap.setComputeHorizontalDiffraction(compute_vertical_diffraction)
     pointNoiseMap.setComputeVerticalDiffraction(compute_horizontal_diffraction)
     pointNoiseMap.setSoundReflectionOrder(reflexion_order)
-
 
     // Set environmental parameters
     PropagationProcessPathData environmentalDataDay = new PropagationProcessPathData(false)
@@ -649,13 +642,13 @@ def exec(Connection connection, input) {
     pointNoiseMap.setPropagationProcessPathData(LDENConfig.TIME_PERIOD.NIGHT, environmentalDataNight)
 
     // Building height field name
-    pointNoiseMap.setHeightField("HEIGHT")
+    pointNoiseMap.setHeightField('HEIGHT')
     // Import table with Snow, Forest, Grass, Pasture field polygons. Attribute G is associated with each polygon
-    if (ground_table_name != "") {
+    if (ground_table_name != '') {
         pointNoiseMap.setSoilTableName(ground_table_name)
     }
     // Point cloud height above sea level POINT(X Y Z)
-    if (dem_table_name != "") {
+    if (dem_table_name != '') {
         pointNoiseMap.setDemTable(dem_table_name)
     }
 
@@ -684,43 +677,42 @@ def exec(Connection connection, input) {
     // Init ProgressLogger (loading bar)
     RootProgressVisitor progressLogger = new RootProgressVisitor(1, true, 1)
 
-
-    logger.info("Start calculation... ")
-    LocalDateTime now = LocalDateTime.now();
-    ProfilerThread profilerThread = new ProfilerThread(new File(String.format("profile_%d_%d_%d_%dh%d.csv",
-            now.getYear(), now.getMonthValue(), now.getDayOfMonth(), now.getHour(), now.getMinute())));
-    profilerThread.addMetric(ldenProcessing);
-    profilerThread.addMetric(new ProgressMetric(progressLogger));
-    profilerThread.addMetric(new JVMMemoryMetric());
-    profilerThread.addMetric(new ReceiverStatsMetric());
-    profilerThread.setWriteInterval(300);
-    profilerThread.setFlushInterval(300);
-    pointNoiseMap.setProfilerThread(profilerThread);
+    logger.info('Start calculation... ')
+    LocalDateTime now = LocalDateTime.now()
+    ProfilerThread profilerThread = new ProfilerThread(new File(String.format('profile_%d_%d_%d_%dh%d.csv',
+            now.getYear(), now.getMonthValue(), now.getDayOfMonth(), now.getHour(), now.getMinute())))
+    profilerThread.addMetric(ldenProcessing)
+    profilerThread.addMetric(new ProgressMetric(progressLogger))
+    profilerThread.addMetric(new JVMMemoryMetric())
+    profilerThread.addMetric(new ReceiverStatsMetric())
+    profilerThread.setWriteInterval(300)
+    profilerThread.setFlushInterval(300)
+    pointNoiseMap.setProfilerThread(profilerThread)
     try {
         ldenProcessing.start()
-        new Thread(profilerThread).start();
+        new Thread(profilerThread).start()
         // Iterate over computation areas
         int k = 0
         Map cells = pointNoiseMap.searchPopulatedCells(connection)
         ProgressVisitor progressVisitor = progressLogger.subProcess(cells.size())
         new TreeSet<>(cells.keySet()).each { cellIndex ->
             // Run ray propagation
-            logger.info(String.format("Compute... %.3f %% (%d receivers in this cell)", 100 * k++ / cells.size(), cells.get(cellIndex)))
+            logger.info(String.format('Compute... %.3f %% (%d receivers in this cell)', 100 * k++ / cells.size(), cells.get(cellIndex)))
             IComputeRaysOut out = pointNoiseMap.evaluateCell(connection, cellIndex.getLatitudeIndex(), cellIndex.getLongitudeIndex(), progressVisitor, receivers)
             // Export as a Google Earth 3d scene
             if (out instanceof ComputeRaysOutAttenuation && folderExportKML != null) {
-                ComputeRaysOutAttenuation cellStorage = (ComputeRaysOutAttenuation) out;
+                ComputeRaysOutAttenuation cellStorage = (ComputeRaysOutAttenuation) out
                 exportScene(new File(folderExportKML.getPath(),
-                        String.format(Locale.ROOT, kmlFileNamePrepend + "_%d_%d.kml", cellIndex.getLatitudeIndex(),
+                        String.format(Locale.ROOT, kmlFileNamePrepend + '_%d_%d.kml', cellIndex.getLatitudeIndex(),
                                 cellIndex.getLongitudeIndex())).getPath(),
                         cellStorage.inputData.profileBuilder, cellStorage, sridSources)
             }
         }
-    } catch(IllegalArgumentException | IllegalStateException ex) {
-        System.err.println(ex);
-        throw ex;
+    } catch (IllegalArgumentException | IllegalStateException ex) {
+        System.err.println(ex)
+        throw ex
     } finally {
-        profilerThread.stop();
+        profilerThread.stop()
         ldenProcessing.stop()
     }
 
@@ -728,39 +720,39 @@ def exec(Connection connection, input) {
     StringBuilder createdTables = new StringBuilder()
 
     if (ldenConfig.computeLDay) {
-        sql.execute("drop table if exists LDAY_GEOM;")
+        sql.execute('drop table if exists LDAY_GEOM;')
         logger.info('create table LDAY_GEOM')
-        forgeCreateTable(sql, "LDAY_GEOM", ldenConfig, geomFieldsRcv.get(0), receivers_table_name,
+        forgeCreateTable(sql, 'LDAY_GEOM', ldenConfig, geomFieldsRcv.get(0), receivers_table_name,
                 ldenConfig.lDayTable)
-        createdTables.append(" LDAY_GEOM")
-        sql.execute("drop table if exists " + TableLocation.parse(ldenConfig.getlDayTable()))
+        createdTables.append(' LDAY_GEOM')
+        sql.execute('drop table if exists ' + TableLocation.parse(ldenConfig.getlDayTable()))
     }
     if (ldenConfig.computeLEvening) {
-        sql.execute("drop table if exists LEVENING_GEOM;")
+        sql.execute('drop table if exists LEVENING_GEOM;')
         logger.info('create table LEVENING_GEOM')
-        forgeCreateTable(sql, "LEVENING_GEOM", ldenConfig, geomFieldsRcv.get(0), receivers_table_name,
+        forgeCreateTable(sql, 'LEVENING_GEOM', ldenConfig, geomFieldsRcv.get(0), receivers_table_name,
                 ldenConfig.lEveningTable)
-        createdTables.append(" LEVENING_GEOM")
-        sql.execute("drop table if exists " + TableLocation.parse(ldenConfig.getlEveningTable()))
+        createdTables.append(' LEVENING_GEOM')
+        sql.execute('drop table if exists ' + TableLocation.parse(ldenConfig.getlEveningTable()))
     }
     if (ldenConfig.computeLNight) {
-        sql.execute("drop table if exists LNIGHT_GEOM;")
+        sql.execute('drop table if exists LNIGHT_GEOM;')
         logger.info('create table LNIGHT_GEOM')
-        forgeCreateTable(sql, "LNIGHT_GEOM", ldenConfig, geomFieldsRcv.get(0), receivers_table_name,
+        forgeCreateTable(sql, 'LNIGHT_GEOM', ldenConfig, geomFieldsRcv.get(0), receivers_table_name,
                 ldenConfig.lNightTable)
-        createdTables.append(" LNIGHT_GEOM")
-        sql.execute("drop table if exists " + TableLocation.parse(ldenConfig.getlNightTable()))
+        createdTables.append(' LNIGHT_GEOM')
+        sql.execute('drop table if exists ' + TableLocation.parse(ldenConfig.getlNightTable()))
     }
     if (ldenConfig.computeLDEN) {
-        sql.execute("drop table if exists LDEN_GEOM;")
+        sql.execute('drop table if exists LDEN_GEOM;')
         logger.info('create table LDEN_GEOM')
-        forgeCreateTable(sql, "LDEN_GEOM", ldenConfig, geomFieldsRcv.get(0), receivers_table_name,
+        forgeCreateTable(sql, 'LDEN_GEOM', ldenConfig, geomFieldsRcv.get(0), receivers_table_name,
                 ldenConfig.lDenTable)
-        createdTables.append(" LDEN_GEOM")
-        sql.execute("drop table if exists " + TableLocation.parse(ldenConfig.getlDenTable()))
+        createdTables.append(' LDEN_GEOM')
+        sql.execute('drop table if exists ' + TableLocation.parse(ldenConfig.getlDenTable()))
     }
 
-    resultString = "Calculation Done ! " + createdTables.toString() + " table(s) have been created."
+    resultString = 'Calculation Done ! ' + createdTables + ' table(s) have been created.'
 
     // print to command window
     logger.info('Result : ' + resultString)
@@ -769,6 +761,4 @@ def exec(Connection connection, input) {
     // print to WPS Builder
     return resultString
 
-
 }
-

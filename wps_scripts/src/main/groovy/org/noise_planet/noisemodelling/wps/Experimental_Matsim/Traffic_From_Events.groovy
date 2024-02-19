@@ -12,7 +12,6 @@
 /**
  * @Author Valentin Le Bescond, Université Gustave Eiffel
  */
-
 package org.noise_planet.noisemodelling.wps.Experimental_Matsim
 
 import geoserver.GeoServer
@@ -55,7 +54,7 @@ inputs = [
                 '<br/>The folder must contain at least the following files: ' +
                 '<br/><br/> - output_network.xml.gz' +
                 '<br/><br/> - output_events.xml.gz',
-        type: String.class
+        type: String
     ],
     timeBinSize: [
             name: 'The size of time bins in seconds.',
@@ -64,7 +63,7 @@ inputs = [
                     '<br/>The time information stored will be the starting time of the time bins ' +
                     '<br/>For exemple with a timeBinSize of 3600, the data will be analysed using the following timeBins: ' +
                     '<br/>0, 3600, 7200, ..., 79200, 82800',
-            type: Integer.class
+            type: Integer
     ],
     populationFactor: [
             name: 'Population Factor',
@@ -74,7 +73,7 @@ inputs = [
                     '<br/>Default: 1.0',
             min: 0,
             max: 1,
-            type: String.class
+            type: String
     ],
     link2GeometryFile: [
         name: 'Network CSV file',
@@ -85,7 +84,7 @@ inputs = [
                 '<br/><br/> - The WKT geometry',
         min: 0,
         max: 1,
-        type: String.class
+        type: String
     ],
     SRID : [
             name: 'Projection identifier',
@@ -95,7 +94,7 @@ inputs = [
                     '</br><b> Default value : 4326 </b> ',
             min: 0,
             max: 1,
-            type: Integer.class
+            type: Integer
     ],
     exportTraffic: [
             name: 'Export additionnal traffic data ?',
@@ -104,7 +103,7 @@ inputs = [
                     '<br/>Default: False',
             min: 0,
             max: 1,
-            type: Boolean.class
+            type: Boolean
     ],
     skipUnused: [
         name: 'Skip unused links ?',
@@ -113,7 +112,7 @@ inputs = [
                 '<br/>Default: True',
         min: 0,
         max: 1,
-        type: Boolean.class
+        type: Boolean
     ],
     outTableName: [
         name: 'Output table name',
@@ -125,7 +124,7 @@ inputs = [
                 '<br/><br/> - the table MATSIM_ROADS_LW, with the link ID and the traffic data',
         min: 0,
         max: 1,
-        type: String.class
+        type: String
     ]
 ]
 
@@ -134,7 +133,7 @@ outputs = [
         name: 'Result output string',
         title: 'Result output string',
         description: 'This type of result does not allow the blocks to be linked together.',
-        type: String.class
+        type: String
     ]
 ]
 
@@ -150,11 +149,10 @@ static Connection openGeoserverDataStoreConnection(String dbName) {
 
 // run the script
 def run(input) {
-
     // Get name of the database
     // by default an embedded h2gis database is created
     // Advanced user can replace this database for a postGis or h2Gis server database.
-    String dbName = "h2gisdb"
+    String dbName = 'h2gisdb'
 
     // Open connection
     openGeoserverDataStoreConnection(dbName).withCloseable {
@@ -165,109 +163,108 @@ def run(input) {
 
 // main function of the script
 def exec(Connection connection, input) {
-
     connection = new ConnectionWrapper(connection)
     Sql sql = new Sql(connection)
 
     String resultString = null
 
-    Logger logger = LoggerFactory.getLogger("org.noise_planet.noisemodelling")
+    Logger logger = LoggerFactory.getLogger('org.noise_planet.noisemodelling')
     logger.info('Start : Traffic_From_Events')
-    logger.info("inputs {}", input)
+    logger.info('inputs {}', input)
 
-    String folder = input["folder"]
+    String folder = input['folder']
 
-    String outTableName = "MATSIM_ROADS"
-    if (input["outTableName"]) {
-        outTableName = input["outTableName"]
+    String outTableName = 'MATSIM_ROADS'
+    if (input['outTableName']) {
+        outTableName = input['outTableName']
     }
-    String lwTableName = outTableName + "_LW"
-    String trafficTableName = outTableName + "_TRAFFIC"
-    String contribTableName = outTableName + "_CONTRIB"
+    String lwTableName = outTableName + '_LW'
+    String trafficTableName = outTableName + '_TRAFFIC'
+    String contribTableName = outTableName + '_CONTRIB'
 
-    String link2GeometryFile = ""
-    if (input["link2GeometryFile"]) {
-        link2GeometryFile = input["link2GeometryFile"]
-    }
-
-    int timeBinSize = 3600;
-    if (input["timeBinSize"]) {
-        timeBinSize = input["timeBinSize"] as int
-    }
-    int timeBinMin = 0;
-    if (input["timeBinMin"]) {
-        timeBinMin = input["timeBinMin"] as int
-    }
-    int timeBinMax = 86400;
-    if (input["timeBinMax"]) {
-        timeBinMax = input["timeBinMax"] as int
+    String link2GeometryFile = ''
+    if (input['link2GeometryFile']) {
+        link2GeometryFile = input['link2GeometryFile']
     }
 
-    String SRID = "4326"
+    int timeBinSize = 3600
+    if (input['timeBinSize']) {
+        timeBinSize = input['timeBinSize'] as int
+    }
+    int timeBinMin = 0
+    if (input['timeBinMin']) {
+        timeBinMin = input['timeBinMin'] as int
+    }
+    int timeBinMax = 86400
+    if (input['timeBinMax']) {
+        timeBinMax = input['timeBinMax'] as int
+    }
+
+    String SRID = '4326'
     if (input['SRID']) {
         SRID = input['SRID']
     }
 
     boolean skipUnused = false
-    if (input["skipUnused"]) {
-        skipUnused = input["skipUnused"] as boolean
+    if (input['skipUnused']) {
+        skipUnused = input['skipUnused'] as boolean
     }
 
     boolean keepVehicleContrib = false
-    if (input["keepVehicleContrib"]) {
-        keepVehicleContrib = input["keepVehicleContrib"] as boolean
+    if (input['keepVehicleContrib']) {
+        keepVehicleContrib = input['keepVehicleContrib'] as boolean
     }
 
     boolean exportTraffic = false
-    if (input["exportTraffic"]) {
-        exportTraffic = input["exportTraffic"] as boolean
+    if (input['exportTraffic']) {
+        exportTraffic = input['exportTraffic'] as boolean
     }
 
     double populationFactor = 1.0
-    if (input["populationFactor"]) {
-        populationFactor = input["populationFactor"] as double
+    if (input['populationFactor']) {
+        populationFactor = input['populationFactor'] as double
     }
 
     File f
-    String eventFile = folder + "/output_events.xml.gz"
+    String eventFile = folder + '/output_events.xml.gz'
     f = new File(eventFile)
-    if(!f.exists() || f.isDirectory()) {
-        throw new FileNotFoundException(eventFile, "output_events.xml.gz not found in MATSim folder")
+    if (!f.exists() || f.isDirectory()) {
+        throw new FileNotFoundException(eventFile, 'output_events.xml.gz not found in MATSim folder')
     }
-    String networkFile = folder + "/output_network.xml.gz"
+    String networkFile = folder + '/output_network.xml.gz'
     f = new File(networkFile)
-    if(!f.exists() || f.isDirectory()) {
-        throw new FileNotFoundException(networkFile, "output_network.xml.gz not found in MATSim folder")
+    if (!f.exists() || f.isDirectory()) {
+        throw new FileNotFoundException(networkFile, 'output_network.xml.gz not found in MATSim folder')
     }
-    if (link2GeometryFile != "") {
+    if (link2GeometryFile != '') {
         f = new File(link2GeometryFile)
-        if(!f.exists() || f.isDirectory()) {
-            throw new FileNotFoundException(link2GeometryFile, link2GeometryFile + " not found")
+        if (!f.exists() || f.isDirectory()) {
+            throw new FileNotFoundException(link2GeometryFile, link2GeometryFile + ' not found')
         }
     }
 
-    logger.info("Create SQL tables : " + outTableName + " & " + lwTableName)
+    logger.info('Create SQL tables : ' + outTableName + ' & ' + lwTableName)
     // Open connection
-    sql.execute("DROP TABLE IF EXISTS " + outTableName)
-    sql.execute("CREATE TABLE " + outTableName + '''( 
-        PK integer PRIMARY KEY AUTO_INCREMENT, 
+    sql.execute('DROP TABLE IF EXISTS ' + outTableName)
+    sql.execute('CREATE TABLE ' + outTableName + '''(
+        PK integer PRIMARY KEY AUTO_INCREMENT,
         LINK_ID varchar(255),
         OSM_ID varchar(255),
         THE_GEOM geometry
     );''')
 
-    sql.execute("DROP TABLE IF EXISTS " + lwTableName)
-    sql.execute("CREATE TABLE " + lwTableName + '''( 
-        PK integer PRIMARY KEY AUTO_INCREMENT, 
+    sql.execute('DROP TABLE IF EXISTS ' + lwTableName)
+    sql.execute('CREATE TABLE ' + lwTableName + '''(
+        PK integer PRIMARY KEY AUTO_INCREMENT,
         LINK_ID varchar(255),
         LW63 double precision, LW125 double precision, LW250 double precision, LW500 double precision, LW1000 double precision, LW2000 double precision, LW4000 double precision, LW8000 double precision,
         TIME int
     );''')
 
     if (exportTraffic) {
-        sql.execute("DROP TABLE IF EXISTS " + trafficTableName)
-        sql.execute("CREATE TABLE " + trafficTableName + '''( 
-            PK integer PRIMARY KEY AUTO_INCREMENT, 
+        sql.execute('DROP TABLE IF EXISTS ' + trafficTableName)
+        sql.execute('CREATE TABLE ' + trafficTableName + '''(
+            PK integer PRIMARY KEY AUTO_INCREMENT,
             LINK_ID varchar(255),
             LV_D double precision,
             LV_SPD_D double precision,
@@ -279,9 +276,9 @@ def exec(Connection connection, input) {
         );''')
     }
     if (keepVehicleContrib) {
-        sql.execute("DROP TABLE IF EXISTS " + contribTableName)
-        sql.execute("CREATE TABLE " + contribTableName + '''( 
-            PK integer PRIMARY KEY AUTO_INCREMENT, 
+        sql.execute('DROP TABLE IF EXISTS ' + contribTableName)
+        sql.execute('CREATE TABLE ' + contribTableName + '''(
+            PK integer PRIMARY KEY AUTO_INCREMENT,
             LINK_ID varchar(255),
             PERSON_ID varchar(255),
             VEHICLE_ID varchar(255),
@@ -290,23 +287,23 @@ def exec(Connection connection, input) {
         );''')
     }
 
-    PreparedStatement roadStatement = connection.prepareStatement("INSERT INTO " + outTableName + " (LINK_ID, OSM_ID, THE_GEOM) VALUES (?, ?, ST_UpdateZ(ST_GeomFromText(?, " + SRID + "),0.05))")
-    PreparedStatement lwStatement = connection.prepareStatement("INSERT INTO " + lwTableName + " (LINK_ID, LW63, LW125, LW250, LW500, LW1000, LW2000, LW4000, LW8000, TIME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
-    PreparedStatement trafficStatement;
+    PreparedStatement roadStatement = connection.prepareStatement('INSERT INTO ' + outTableName + ' (LINK_ID, OSM_ID, THE_GEOM) VALUES (?, ?, ST_UpdateZ(ST_GeomFromText(?, ' + SRID + '),0.05))')
+    PreparedStatement lwStatement = connection.prepareStatement('INSERT INTO ' + lwTableName + ' (LINK_ID, LW63, LW125, LW250, LW500, LW1000, LW2000, LW4000, LW8000, TIME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+    PreparedStatement trafficStatement
     if (exportTraffic) {
-        trafficStatement = connection.prepareStatement("INSERT INTO " + trafficTableName + " (LINK_ID, LV_D, LV_SPD_D, MV_D, MV_SPD_D, HGV_D, HGV_SPD_D, TIME) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+        trafficStatement = connection.prepareStatement('INSERT INTO ' + trafficTableName + ' (LINK_ID, LV_D, LV_SPD_D, MV_D, MV_SPD_D, HGV_D, HGV_SPD_D, TIME) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
     }
-    PreparedStatement contribStatement;
+    PreparedStatement contribStatement
     if (keepVehicleContrib) {
-        contribStatement = connection.prepareStatement("INSERT INTO " + contribTableName + " (LINK_ID, PERSON_ID, VEHICLE_ID, LW63, LW125, LW250, LW500, LW1000, LW2000, LW4000, LW8000, TIME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+        contribStatement = connection.prepareStatement('INSERT INTO ' + contribTableName + ' (LINK_ID, PERSON_ID, VEHICLE_ID, LW63, LW125, LW250, LW500, LW1000, LW2000, LW4000, LW8000, TIME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
     }
-    logger.info("Done Creating SQL tables")
+    logger.info('Done Creating SQL tables')
 
     Network network = ScenarioUtils.loadScenario(ConfigUtils.createConfig()).getNetwork()
     MatsimNetworkReader networkReader = new MatsimNetworkReader(network)
-    logger.info("Start reading network file ... ")
+    logger.info('Start reading network file ... ')
     networkReader.readFile(networkFile)
-    logger.info("Done reading network file ")
+    logger.info('Done reading network file ')
 
     Map<Id<Link>, Link> links = (Map<Id<Link>, Link>) network.getLinks()
 
@@ -324,35 +321,35 @@ def exec(Connection connection, input) {
 
     MatsimEventsReader eventsReader = new MatsimEventsReader(evMgr)
 
-    logger.info("Start reading event file ... ")
+    logger.info('Start reading event file ... ')
     eventsReader.readFile(eventFile)
-    logger.info("Done reading event file ")
+    logger.info('Done reading event file ')
 
     Map<String, String> link2geomData = new HashMap<>()
     if (!link2GeometryFile.isEmpty()) {
-        logger.info("Start Reading link2geom file ...")
+        logger.info('Start Reading link2geom file ...')
         BufferedReader br = new BufferedReader(new FileReader(link2GeometryFile))
-        String line = null;
+        String line = null
         while ((line = br.readLine()) != null) {
-            String[] str = line.split(",", 2)
+            String[] str = line.split(',', 2)
             if (str.size() > 1) {
-                link2geomData.put(str[0], str[1].trim().replace("\"", ""))
+                link2geomData.put(str[0], str[1].trim().replace('\"', ''))
             }
         }
-        logger.info("Done Reading link2geom file")
+        logger.info('Done Reading link2geom file')
     }
 
-    logger.info("Start Inserting Into SQL tables...")
+    logger.info('Start Inserting Into SQL tables...')
     int counter = 0
     int doprint = 1
-    long start = System.currentTimeMillis();
+    long start = System.currentTimeMillis()
     for (Map.Entry<Id<Link>, LinkStatStruct> entry : evHandler.links.entrySet()) {
-        String linkId = entry.getKey().toString()
+        String linkId = entry.getKey()
         LinkStatStruct linkStatStruct = entry.getValue()
         if (counter >= doprint) {
             double elapsed = (System.currentTimeMillis() - start + 1) / 1000
-            logger.info(String.format("Processing Link %d (max:%d) - elapsed : %ss (%.1fit/s) - eta : %ss",
-                    counter, evHandler.links.size(), elapsed, counter/elapsed, (evHandler.links.size() - counter) / (counter / elapsed)))
+            logger.info(String.format('Processing Link %d (max:%d) - elapsed : %ss (%.1fit/s) - eta : %ss',
+                    counter, evHandler.links.size(), elapsed, counter / elapsed, (evHandler.links.size() - counter) / (counter / elapsed)))
             doprint *= 2
         }
         counter ++
@@ -362,11 +359,11 @@ def exec(Connection connection, input) {
         }
         linkStatStruct.calculate()
 
-        String geomString = ""
+        String geomString = ''
         if (!link2GeometryFile.isEmpty()) {
             geomString = link2geomData.get(linkId)
         }
-        if (geomString == '' || geomString == null || geomString.matches("LINESTRING\\(\\d+\\.\\d+ \\d+\\.\\d+\\)")) {
+        if (geomString == '' || geomString == null || geomString.matches('LINESTRING\\(\\d+\\.\\d+ \\d+\\.\\d+\\)')) {
             geomString = linkStatStruct.getGeometryString()
         }
         roadStatement.setString(1, linkId)
@@ -409,11 +406,11 @@ def exec(Connection connection, input) {
             trafficStatement.executeBatch()
         }
         if (keepVehicleContrib) {
-//            sql.execute(linkStatStruct.toSqlInsertContrib(contribTableName));
+            //            sql.execute(linkStatStruct.toSqlInsertContrib(contribTableName));
             for (int timeBin = 0 ; timeBin < 86400; timeBin += timeBinSize) {
                 for (PersonContribFreq person_contrib : linkStatStruct.contributions.get(timeBin)) {
-                    String personId = person_contrib.personId.toString()
-                    String vehicleId = person_contrib.vehicleId.toString()
+                    String personId = person_contrib.personId
+                    String vehicleId = person_contrib.vehicleId
                     List<Double> contributions = person_contrib.contributions
                     int index = 1
                     contribStatement.setString(index, linkId)
@@ -433,26 +430,26 @@ def exec(Connection connection, input) {
             contribStatement.executeBatch()
         }
     }
-    logger.info("DONE Inserting Into SQL tables...")
+    logger.info('DONE Inserting Into SQL tables...')
 
-    logger.info("Start Creating indexes on tables ...")
-    logger.info("CREATE INDEX " + outTableName + "_LINK_ID_IDX ON " + outTableName + " (LINK_ID);")
-    sql.execute("CREATE INDEX " + outTableName + "_LINK_ID_IDX ON " + outTableName + " (LINK_ID);")
-    logger.info("CREATE INDEX " + lwTableName + "_LINK_ID_IDX ON " + lwTableName + " (LINK_ID);")
-    sql.execute("CREATE INDEX " + lwTableName + "_LINK_ID_IDX ON " + lwTableName + " (LINK_ID);")
-    logger.info("CREATE INDEX " + lwTableName + "_TIME_IDX ON " + lwTableName + " (TIME);")
-    sql.execute("CREATE INDEX " + lwTableName + "_TIME_IDX ON " + lwTableName + " (TIME);")
+    logger.info('Start Creating indexes on tables ...')
+    logger.info('CREATE INDEX ' + outTableName + '_LINK_ID_IDX ON ' + outTableName + ' (LINK_ID);')
+    sql.execute('CREATE INDEX ' + outTableName + '_LINK_ID_IDX ON ' + outTableName + ' (LINK_ID);')
+    logger.info('CREATE INDEX ' + lwTableName + '_LINK_ID_IDX ON ' + lwTableName + ' (LINK_ID);')
+    sql.execute('CREATE INDEX ' + lwTableName + '_LINK_ID_IDX ON ' + lwTableName + ' (LINK_ID);')
+    logger.info('CREATE INDEX ' + lwTableName + '_TIME_IDX ON ' + lwTableName + ' (TIME);')
+    sql.execute('CREATE INDEX ' + lwTableName + '_TIME_IDX ON ' + lwTableName + ' (TIME);')
     if (keepVehicleContrib) {
-        logger.info("CREATE INDEX " + contribTableName + "_LINK_ID_IDX ON " + contribTableName + " (LINK_ID);")
-        sql.execute("CREATE INDEX " + contribTableName + "_LINK_ID_IDX ON " + contribTableName + " (LINK_ID);")
-        logger.info("CREATE INDEX " + contribTableName + "_TIME_IDX ON " + contribTableName + " (TIME);")
-        sql.execute("CREATE INDEX " + contribTableName + "_TIME_IDX ON " + contribTableName + " (TIME);")
-        logger.info("CREATE INDEX " + contribTableName + "_PERSON_ID_IDX ON " + contribTableName + " (PERSON_ID);")
-        sql.execute("CREATE INDEX " + contribTableName + "_PERSON_ID_IDX ON " + contribTableName + " (PERSON_ID);")
+        logger.info('CREATE INDEX ' + contribTableName + '_LINK_ID_IDX ON ' + contribTableName + ' (LINK_ID);')
+        sql.execute('CREATE INDEX ' + contribTableName + '_LINK_ID_IDX ON ' + contribTableName + ' (LINK_ID);')
+        logger.info('CREATE INDEX ' + contribTableName + '_TIME_IDX ON ' + contribTableName + ' (TIME);')
+        sql.execute('CREATE INDEX ' + contribTableName + '_TIME_IDX ON ' + contribTableName + ' (TIME);')
+        logger.info('CREATE INDEX ' + contribTableName + '_PERSON_ID_IDX ON ' + contribTableName + ' (PERSON_ID);')
+        sql.execute('CREATE INDEX ' + contribTableName + '_PERSON_ID_IDX ON ' + contribTableName + ' (PERSON_ID);')
     }
 
-    logger.info("Done Creating indexes on tables.")
-    resultString = "Roads stats imported from matsim traffic output"
+    logger.info('Done Creating indexes on tables.')
+    resultString = 'Roads stats imported from matsim traffic output'
     logger.info('Result : ' + resultString)
     return resultString
 }
@@ -464,9 +461,9 @@ class ProcessOutputEventHandler implements
 
     Map<Id<Link>, LinkStatStruct> links = new HashMap<Id<Link>, LinkStatStruct>()
     Map<Id<Vehicle>, List<Id<Person>>> personsInVehicle = new HashMap<Id<Vehicle>, List<Id<Person>>>()
-    int timeBinSize = 3600;
-    int timeBinMin = 0;
-    int timeBinMax = 86400;
+    int timeBinSize = 3600
+    int timeBinMin = 0
+    int timeBinMax = 86400
     String SRID = 4326
     double populationFactor = 1.0
 
@@ -491,7 +488,7 @@ class ProcessOutputEventHandler implements
     @Override
     void handleEvent(VehicleEntersTrafficEvent event) {
         if (!personsInVehicle.containsKey(event.getVehicleId())) {
-            List<Id<Person>> personList = new ArrayList<Id<Person>>()
+            List<Id<Person>> personList = []
             personList.add(event.getPersonId())
             personsInVehicle.put(event.getVehicleId(), personList)
         }
@@ -500,7 +497,7 @@ class ProcessOutputEventHandler implements
     @Override
     void handleEvent(PersonEntersVehicleEvent event) {
         if (!personsInVehicle.containsKey(event.getVehicleId())) {
-            List<Id<Person>> personList = new ArrayList<Id<Person>>()
+            List<Id<Person>> personList = []
             personList.add(event.getPersonId())
             personsInVehicle.put(event.getVehicleId(), personList)
         } else {
@@ -527,7 +524,6 @@ class ProcessOutputEventHandler implements
 
     @Override
     void handleEvent(LinkEnterEvent event) {
-
         Id<Link> linkId = event.getLinkId()
         Id<Vehicle> vehicleId = event.getVehicleId()
 
@@ -547,7 +543,6 @@ class ProcessOutputEventHandler implements
 
     @Override
     void handleEvent(LinkLeaveEvent event) {
-
         Id<Link> linkId = event.getLinkId()
         Id<Vehicle> vehicleId = event.getVehicleId()
         double time = event.getTime()
@@ -575,11 +570,16 @@ class ProcessOutputEventHandler implements
         }
     }
 
-}
+        }
 
 class Trip {
+
     enum Type {
+
+
+
         LV, MV, HV
+
     };
 
     public int timeBin
@@ -595,9 +595,11 @@ class Trip {
         this.travelTime = travelTime
         this.persons = persons
     }
+
 }
 
 class PersonContrib {
+
     public Id<Person> personId
     public Id<Vehicle> vehicleId
     public double contrib
@@ -607,9 +609,11 @@ class PersonContrib {
         this.vehicleId = vehicleId
         this.contrib = contrib
     }
+
 }
 
 class PersonContribFreq {
+
     public Id<Person> personId
     public Id<Vehicle> vehicleId
     public List<Double> contributions
@@ -619,6 +623,7 @@ class PersonContribFreq {
         this.vehicleId = vehicleId
         this.contributions = contributions
     }
+
 }
 
 class LinkStatStruct {
@@ -658,25 +663,25 @@ class LinkStatStruct {
     }
 
     void vehicleLeaveAt(Id<Vehicle> vehicleId, double time) {
-        vehicleLeaveAt(vehicleId, time, new ArrayList<Id<Person>>())
+        vehicleLeaveAt(vehicleId, time, []
     }
 
     void vehicleLeaveAt(Id<Vehicle> vehicleId, double time, List<Id<Person>> persons) {
         int timeBin = getTimeBin(time)
         if (!trips.containsKey(timeBin)) {
-            trips.put(timeBin, new ArrayList<Trip>())
+            trips.put(timeBin, []
         }
         if (enterTimes.containsKey(vehicleId)) {
             double enterTime = enterTimes.get(vehicleId)
             double travelTime = time - enterTime
             Trip.Type type = Trip.Type.LV
-            if (vehicleId.toString().contains("bus")) {
+            if (vehicleId.toString().contains('bus')) {
                 type = Trip.Type.MV
             }
-            if (vehicleId.toString().contains("tram")) {
+            if (vehicleId.toString().contains('tram')) {
                 return
             }
-            if (vehicleId.toString().contains("rail")) {
+            if (vehicleId.toString().contains('rail')) {
                 return
             }
             Trip trip = new Trip(timeBin, vehicleId, type, travelTime, new ArrayList<Id<Person>>(persons))
@@ -744,7 +749,7 @@ class LinkStatStruct {
         return min
     }
     private int getTimeBin(double time) {
-        return (time - time % timeBinSize) % 86400;
+        return (time - time % timeBinSize) % 86400
     }
 
     void setLink(Link link) {
@@ -768,7 +773,7 @@ class LinkStatStruct {
             RoadCnossosParameters rsParametersCnossos = new RoadCnossosParameters(
                     LVAvgSpeed,MVAvgSpeed,HVAvgSpeed,0.0,0.0,
                     LVCount,MVCount,HVCount,0.0,0.0,
-                    freqs[i],20.0,"NL08",0.0,0.0,
+                    freqs[i],20.0,'NL08',0.0,0.0,
                     100,2)
 
             result[i] = RoadCnossos.evaluate(rsParametersCnossos)
@@ -796,8 +801,8 @@ class LinkStatStruct {
     }
 
     Coordinate[] getGeometry() {
-        if (link.getAttributes().getAsMap().containsKey("geometry")) {
-            Coord[] coords = ((Coord[]) link.getAttributes().getAttribute("geometry"))
+        if (link.getAttributes().getAsMap().containsKey('geometry')) {
+            Coord[] coords = ((Coord[]) link.getAttributes().getAttribute('geometry'))
             Coordinate[] result = new Coordinate[coords.length]
             for (int i = 0; i < coords.length; i++) {
                 result[i] = new Coordinate(coords[i].getX(), coords[i].getY(), 0.05)
@@ -820,14 +825,14 @@ class LinkStatStruct {
     }
     String getGeometryString() {
         Coordinate[] points = getGeometry()
-        return WKTWriter.toLineString(points);
+        return WKTWriter.toLineString(points)
     }
 
     String getOsmId() {
-        if (link.getAttributes().getAsMap().containsKey("origid")) {
-            return link.getAttributes().getAttribute("origid").toString()
-        } else if (link.getId().toString().contains("_")) {
-            return link.getId().toString().split("_")[0]
+        if (link.getAttributes().getAsMap().containsKey('origid')) {
+            return link.getAttributes().getAttribute('origid').toString()
+        } else if (link.getId().toString().contains('_')) {
+            return link.getId().toString().split('_')[0]
         } else {
             return String.valueOf(Long.parseLong(link.getId().toString()))
         }
@@ -844,7 +849,7 @@ class LinkStatStruct {
                 levels.put(timeBin, new ArrayList<Double>(empty_levels))
             }
             if (!contributions.containsKey(timeBin)) {
-                contributions.put(timeBin, new ArrayList<PersonContribFreq>())
+                contributions.put(timeBin, []
             }
             for (Trip trip in trips.get(timeBin)) {
                 double speed = Math.round(3.6 * link.getLength() / trip.travelTime)
@@ -867,4 +872,5 @@ class LinkStatStruct {
             }
         }
     }
+
 }
