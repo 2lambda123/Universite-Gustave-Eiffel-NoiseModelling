@@ -1,5 +1,6 @@
 package org.noise_planet.noisemodelling.pathfinder;
 
+import java.nio.file.Files;
 import org.locationtech.jts.algorithm.Orientation;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.index.quadtree.Quadtree;
@@ -119,7 +120,7 @@ public class LayerTinfour implements LayerDelaunay {
 
     public void dumpDataClass() {
         try {
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(dumpFolder, "tinfour_data.dump")))) {
+            try (BufferedWriter writer = Files.newBufferedWriter(new File(dumpFolder, "tinfour_data.dump").toPath())) {
                 writer.write("Vertex " + ptsIndex.size() + "\n");
                 int index = 0;
                 for(Object vObj : ptsIndex.queryAll()) {
@@ -163,7 +164,7 @@ public class LayerTinfour implements LayerDelaunay {
         GeometryFactory factory = new GeometryFactory();
         WKTWriter wktWriter = new WKTWriter(3);
         try {
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(dumpFolder, "tinfour_dump.csv")))) {
+            try (BufferedWriter writer = Files.newBufferedWriter(new File(dumpFolder, "tinfour_dump.csv").toPath())) {
                 for(Object vObj : ptsIndex.queryAll()) {
                     if(vObj instanceof Vertex) {
                         final Vertex v = (Vertex)vObj;
