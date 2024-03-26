@@ -33,6 +33,7 @@
  */
 package org.noise_planet.noisemodelling.pathfinder.utils;
 
+import java.nio.file.Files;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +85,7 @@ public class ProfilerThread  implements Runnable {
     public void run() {
         long lastWrite = 0;
         long lastFlush = 0;
-        try(BufferedWriter b = new BufferedWriter(new FileWriter(outputFile))) {
+        try(BufferedWriter b = Files.newBufferedWriter(outputFile.toPath())) {
             StringBuilder sb = new StringBuilder();
             for(Metric m : metrics) {
                 for(String columnName : m.getColumnNames()) {
